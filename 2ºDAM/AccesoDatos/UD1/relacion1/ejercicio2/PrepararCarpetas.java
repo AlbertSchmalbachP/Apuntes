@@ -1,9 +1,9 @@
-import java.nio.file.Files;
 import java.nio.file.Path;
 public class PrepararCarpetas {
     public static void main(String[] args) {
-        Path datos = Path.of("datos");
-        Path copias = datos.resolve("copias");
-        Files.createDirectories(datos, copias);
+        Path carpeta1 = Path.of("datos");
+        Path carpeta2 = carpeta1.resolve("copias");
+        Path archivo1 = carpeta1.resolve("clubes.txt");
+        Path archivo2 = carpeta2.resolve("respaldo.txt");
     }
 }
