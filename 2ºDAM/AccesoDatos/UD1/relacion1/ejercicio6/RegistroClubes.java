@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class RegistroClubes {
     public static void main(String[] args) {
-        Path carpeta = Path.of("datos");
+        Path carpeta = Path.of("datos"); //! EXCEPTION: The method of(String) is undefined for the type Path
         Path archivo = carpeta.resolve("clubes.csv");
         try {
             Files.createDirectories(carpeta);
@@ -18,24 +18,26 @@ public class RegistroClubes {
                 Files.createFile(archivo);
             }
             Scanner escaner = new Scanner(System.in);
-            boolean idRepetida = true;
             System.out.println("Introduce una ID:");
             String inputId = escaner.nextLine();
-            while (idRepetida) {
+            boolean idRepetida;
+            do {
+                idRepetida = false;
                 try (BufferedReader entrada = Files.newBufferedReader(
                     archivo, StandardCharsets.UTF_8)) {
                     String linea;
                     while ((linea = entrada.readLine()) != null) {
-                        if (!linea.equals(inputId)) {
-                            idRepetida = false;
-                        } else {
+                        String[] partes = linea.split(";");
+                        if (partes.length > 0 && partes[0].equals(inputId)) {
                             idRepetida = true;
                         }
                     }
                 }
-                System.out.println("Introduce una ID:");
-                inputId = escaner.nextLine();
-            }
+                if (idRepetida) {
+                    System.out.println("Introduce una ID:");
+                    inputId = escaner.nextLine();
+                }
+            } while (idRepetida);
             System.out.println("Introduce un nombre:");
             String inputNombre = escaner.nextLine();
             System.out.println("Introduce una ciudad:");
@@ -50,6 +52,12 @@ public class RegistroClubes {
             } catch (Exception e) {
                 System.err.println("Ha habido un error. Comprueba que has introcido el formato especificado: " + e.getMessage());
             }
+            try (BufferedReader entrada = Files.newBufferedReader(archivo, StandardCharsets.UTF_8)) {
+                String linea;
+                while ((linea = entrada.readLine()) != null) {
+                    System.out.println(linea); } } catch (IOException e) {
+                        System.err.println("No se pudo leer: " + e.getMessage());
+                    }
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
