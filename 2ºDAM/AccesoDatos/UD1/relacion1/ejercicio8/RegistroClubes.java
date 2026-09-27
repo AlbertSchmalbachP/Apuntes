@@ -27,8 +27,8 @@ public class RegistroClubes {
                     archivo, StandardCharsets.UTF_8)) {
                     String linea;
                     while ((linea = entrada.readLine()) != null) {
-                        String[] partes = linea.split(";");
-                        if (partes.length > 0 && partes[0].equals(inputId)) {
+                        String[] valoresLinea = linea.split(";");
+                        if (valoresLinea.length > 0 && valoresLinea[0].equals(inputId)) {
                             idRepetida = true;
                         }
                     }
@@ -50,13 +50,13 @@ public class RegistroClubes {
                 salida.write(inputId + ";" + inputNombre + ";" + inputCiudad);
                 salida.newLine();
             } catch (Exception e) {
-                System.err.println("Ha habido un error. Comprueba que has introcido el formato especificado: " + e.getMessage());
+                System.err.println("Error al insertar los datos. Comprueba que has introcido el formato especificado: " + e.getMessage());
             }
             try (BufferedReader entrada = Files.newBufferedReader(archivo, StandardCharsets.UTF_8)) {
                 String linea;
                 while ((linea = entrada.readLine()) != null) {
                     System.out.println(linea); } } catch (IOException e) {
-                        System.err.println("No se pudo leer: " + e.getMessage());
+                        System.err.println("Error al leer: " + e.getMessage());
                     }
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
