@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class RegistroClubes {
     public static void main(String[] args) {
-        Path carpeta = Path.of("datos"); //! EXCEPTION: The method of(String) is undefined for the type Path
+        Path carpeta = Path.of("datos");
         Path archivo = carpeta.resolve("clubes.csv");
         try {
             Files.createDirectories(carpeta);
@@ -34,7 +34,7 @@ public class RegistroClubes {
                     }
                 }
                 if (idRepetida) {
-                    System.out.println("Introduce una ID:");
+                    System.out.println("ID duplicado. Introduce una ID:");
                     inputId = escaner.nextLine();
                 }
             } while (idRepetida);
