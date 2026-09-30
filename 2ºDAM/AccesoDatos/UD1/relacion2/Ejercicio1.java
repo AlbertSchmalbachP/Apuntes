@@ -11,6 +11,7 @@ public class Ejercicio1 {
 
     public static void main(String[] args) {
         Path ruta = Path.of("videojuegos.csv");
+        List<String> lineaNuevas = new ArrayList<>();
         try {
             if (Files.notExists(ruta)) {
                 System.out.println("No existe el archivo.");
@@ -28,7 +29,7 @@ public class Ejercicio1 {
                 }
                 List<String> lineaOriginales = Files.readAllLines(
                         ruta, StandardCharsets.UTF_8);
-                List<String> lineaNuevas = new ArrayList<>();
+                lineaNuevas.clear();
                 for (String linea : lineaOriginales) {
                     String[] campos = linea.split(";", -1);
                     if (campos.length == 3) {
@@ -44,13 +45,12 @@ public class Ejercicio1 {
         try (BufferedReader entrada = Files.newBufferedReader(
                 ruta, StandardCharsets.UTF_8)) {
             System.out.println("------- ARCHIVO NUEVO -------");
-            String linea;
-            while ((linea = entrada.readLine()) != null) {
+            for (String linea : lineaNuevas) {
                 System.out.println(linea);
             }
             System.out.println("------- FIN ARCHIVO -------");
         } catch (IOException e) {
-            System.err.println("No se pudo leer: " + e.getMessage());
+            System.out.println("No se pudo acceder al archivo: " + e.getMessage());
         }
     }
 }
