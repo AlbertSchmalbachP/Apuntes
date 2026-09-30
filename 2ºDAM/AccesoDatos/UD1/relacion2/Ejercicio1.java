@@ -29,7 +29,6 @@ public class Ejercicio1 {
                 }
                 List<String> lineaOriginales = Files.readAllLines(
                         ruta, StandardCharsets.UTF_8);
-                lineaNuevas.clear();
                 for (String linea : lineaOriginales) {
                     String[] campos = linea.split(";", -1);
                     if (campos.length == 3) {
