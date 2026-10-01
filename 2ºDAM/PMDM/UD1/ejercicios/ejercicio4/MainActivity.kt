@@ -1,5 +1,3 @@
-package com.example.pmdmud1.e04
-
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -16,9 +14,20 @@ class MainActivity : AppCompatActivity() {
         val boton = findViewById<Button>(R.id.btnEvaluar)
 
         boton.setOnClickListener {
-            // TODO 1: convierte y valida nota (Int entre 0 y 10).
-            // TODO 2: si es válida usa when para asignar la calificación.
-            // TODO 3: muestra el resultado o el error.
+            // convierte y valida nota (Int entre 0 y 10).
+            val notaConv = nota.text.toString().toIntOrNull()
+            if (notaConv == null || notaConv > 10 || notaConv < 0) {
+                resultado.text = "Nota no válida."
+            } else {
+                // si es válida usa when para asignar la calificación.
+                // muestra el resultado o el error.
+                when {
+                    notaConv < 5 -> resultado.text = "Suspenso."
+                    notaConv < 7 -> resultado.text = "Aprobado."
+                    notaConv < 9 -> resultado.text = "Notable."
+                    else -> resultado.text = "Sobresaliente."
+                }
+            }
         }
     }
 }
