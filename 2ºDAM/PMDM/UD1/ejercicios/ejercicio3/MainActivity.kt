@@ -16,10 +16,19 @@ class MainActivity : AppCompatActivity() {
         val boton = findViewById<Button>(R.id.btnComprobar)
 
         boton.setOnClickListener {
-            // TODO 1: convierte edad con toIntOrNull().
-            // TODO 2: valida null y los límites 0..120.
-            // TODO 3: usa && para comprobar el acceso.
-            // TODO 4: distingue menor de 18, permitido y mayor de 65.
+            // Convierte edad con toIntOrNull().
+            var edadConv: Int? = edad.text.toString().toIntOrNull()
+            // Valida null y los límites 0..120.
+            if (edadConv == null || edadConv <= 0 || edadConv >= 120) {
+                resultado.text = "Edad no válida."
+            } else {
+                // Distingue menor de 18, permitido y mayor de 65.
+                when {
+                    edadConv < 18 -> resultado.text = "No puede entrar: menor de edad."
+                    edadConv > 65 -> resultado.text = "No puede entrar: supera edad máxima."
+                    else -> resultado.text = "Acceso permitido."
+                }
+            }
         }
     }
 }
