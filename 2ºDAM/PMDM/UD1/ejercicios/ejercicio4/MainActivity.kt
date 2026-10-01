@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
         boton.setOnClickListener {
             // convierte y valida nota (Int entre 0 y 10).
-            val notaConv = nota.text.toString().toIntOrNull()
+            val notaConv : Int? = nota.text.toString().toIntOrNull()
             if (notaConv == null || notaConv > 10 || notaConv < 0) {
                 resultado.text = "Nota no válida."
             } else {
