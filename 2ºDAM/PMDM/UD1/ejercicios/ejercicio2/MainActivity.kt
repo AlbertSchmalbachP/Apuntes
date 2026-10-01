@@ -1,5 +1,3 @@
-package com.example.pmdmud1.e02
-
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -17,9 +15,17 @@ class MainActivity : AppCompatActivity() {
         val boton = findViewById<Button>(R.id.btnTicket)
 
         boton.setOnClickListener {
-            // TODO 1: lee los dos EditText como texto.
-            // TODO 2: conviértelos de forma segura y valida sus valores.
-            // TODO 3: calcula y muestra el importe.
+            // Lee los dos EditText como texto.
+            // Conviértelos de forma segura y valida sus valores.
+            var precioTransformado = precio.text.toString().toDoubleOrNull()
+            var cantidadTransformada = cantidad.text.toString().toDoubleOrNull()
+            // Calcula y muestra el importe.
+            if ((precioTransformado != null) && (cantidadTransformada != null)) {
+                var costeCompra = precioTransformado * cantidadTransformada
+                resultado.text = "Coste total: " + costeCompra + "€."
+            } else {
+                resultado.text = "Por favor, introduce un número válido."
+            }
         }
     }
 }

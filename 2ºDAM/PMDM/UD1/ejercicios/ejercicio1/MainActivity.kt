@@ -1,5 +1,3 @@
-package com.example.ejercicio1
-
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -14,15 +12,14 @@ class MainActivity : AppCompatActivity() {
         val tarjeta = findViewById<TextView>(R.id.tvTarjeta)
         val boton = findViewById<Button>(R.id.btnPresentar)
 
-        val nombre: String = "Miguel"
-        val edad: Int = 28
-        var intentos: Int = 0
+        // Declara nombre (String), edad (Int) e intentos (var Int).
+        val nombre: String = "Albert";
+        val edad: Int = 19;
+        var intentos: Int = 0;
+        // En el clic aumenta intentos, escribe la tarjeta y usa Log.d.
         boton.setOnClickListener {
             intentos++
-            val mensaje = "Soy $nombre, tengo $edad. Intentos: $intentos"
-            tarjeta.text = mensaje
-            Log.d("PMDM", mensaje)
-
+            tarjeta.text = "Mi nombre es $nombre, tengo $edad años y lo he intentado $intentos veces."
         }
     }
 }
