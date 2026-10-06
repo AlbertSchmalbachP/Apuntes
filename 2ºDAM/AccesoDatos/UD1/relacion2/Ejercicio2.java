@@ -18,7 +18,6 @@ public class Ejercicio2 {
             }
             List<String> lineaArchivo = Files.readAllLines(
                     ruta, StandardCharsets.UTF_8);
-            boolean encontrado = false;
             System.out.println("Introduce una ID:");
             int idBuscar = escaner.nextInt();
             int idLinea;
