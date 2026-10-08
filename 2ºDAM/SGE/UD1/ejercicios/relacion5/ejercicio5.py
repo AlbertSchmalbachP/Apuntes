@@ -4,9 +4,7 @@ ventas_telefono_mes = int(input("Introduce el número de ventas realizadas por t
 maximas_ventas_empate = []
 
 if ventas_telefono_mes < 0 or ventas_tienda_mes < 0 or ventas_web_mes < 0:
-    print("No se pueden introducir valores negativos.")
-elif ventas_telefono_mes == "" or ventas_tienda_mes == "" or ventas_web_mes == "":
-    print("Introduce un valor para todos los canales.")
+    print("No se pueden introducir valores negativos. Revisa los valores introducidos.") 
 else:
     if ventas_tienda_mes < ventas_web_mes:
         if ventas_web_mes < ventas_telefono_mes:
