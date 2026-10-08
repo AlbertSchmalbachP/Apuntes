@@ -7,14 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="Saludo personalizado"
-            android:textSize="23sp"
-            android:textStyle="bold" />
+        android:padding="35dp">
         <EditText
             android:id="@+id/etNombre"
             android:layout_width="match_parent"
@@ -22,6 +15,25 @@
             android:hint="Tu nombre"
             android:inputType="textCapWords"
             />
-        <!-- Completa los controles indicados en el enunciado. -->
+        <EditText
+            android:id="@+id/etCiudad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tu ciudad"
+            android:inputType="textCapWords"
+            />
+        <Button
+            android:id="@+id/btnSaludar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Saludar" />
+        <TextView
+            android:id="@+id/tvResultado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Saludo personalizado"
+            android:textSize="23sp"
+            android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>
