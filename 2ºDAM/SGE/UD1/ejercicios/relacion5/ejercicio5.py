@@ -6,14 +6,14 @@ maximas_ventas_empate = []
 if ventas_telefono_mes < 0 or ventas_tienda_mes < 0 or ventas_web_mes < 0:
     print("No se pueden introducir valores negativos. Revisa los valores introducidos.") 
 else:
-    if ventas_tienda_mes < ventas_web_mes:
+    if ventas_tienda_mes < ventas_web_mes: # web gana tienda
         if ventas_web_mes < ventas_telefono_mes:
             maximas_ventas = ventas_telefono_mes
         elif ventas_web_mes > ventas_telefono_mes:
             maximas_ventas = ventas_web_mes
         else: # web y teléfono empatan
             maximas_ventas_empate = ["web", "teléfono"]
-    elif ventas_tienda_mes > ventas_web_mes:
+    elif ventas_tienda_mes > ventas_web_mes: # tienda gana web
         if ventas_tienda_mes < ventas_telefono_mes:
             maximas_ventas = ventas_telefono_mes
         elif ventas_tienda_mes > ventas_telefono_mes:
