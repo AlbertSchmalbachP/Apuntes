@@ -50,6 +50,12 @@
             android:textSize="18sp"
             android:paddingTop="12dp"
             />
+            <Button
+                android:id="@+id/btnLimpiar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Limpiar"
+            />
         <!-- Añade aquí btnLimpiar (id exacto), tal como pide el enunciado. -->
     </LinearLayout>
 </ScrollView>
