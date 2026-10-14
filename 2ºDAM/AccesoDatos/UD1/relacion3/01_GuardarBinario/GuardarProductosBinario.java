@@ -17,19 +17,21 @@ public class GuardarProductosBinario {
         productos.add(new Producto(2, "Ratón Inalámbrico Logitech", 24.99, 40));
         productos.add(new Producto(3, "Ryzen 7 5800X\"", 189.99, 12));
         productos.add(new Producto(4, "Ventiladores de hidrógeno líquido", 74999.99, 1));
+
         try {
             // 2: crear la carpeta datos si hace falta.
             Files.createDirectories(archivo.getParent());
+            
             // 3: guardar la lista completa con ObjectOutputStream.
             try (ObjectOutputStream salida = new ObjectOutputStream(
                     Files.newOutputStream(archivo))) {
                 salida.writeObject(productos);
             }
             System.out.println("Productos guardados en " + archivo.toAbsolutePath());
+
         // 4: controlar IOException.
         } catch (IOException e) {
-            // 4: mensaje comprensible
-            System.err.println("No se pudieron guardar los productos: " + e.getMessage());
+            System.err.println("Error al guardar: " + e.getMessage());
         }
     }
 }
