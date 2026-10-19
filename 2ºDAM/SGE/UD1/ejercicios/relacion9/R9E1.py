@@ -13,3 +13,5 @@ while not valido:
             print("El precio no puede ser negativo")
     except ValueError:
         print("Introduce un número válido")
+
+print(f"Precio válido: {precio:.2f} EUR")
