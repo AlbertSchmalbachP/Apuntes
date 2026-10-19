@@ -1,6 +1,9 @@
 # R9E5 | Programa principal
 
 from R9E5_calculos import calcular_subtotal, aplicar_descuento
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from funciones_python import pedir_numero
 
 precio = pedir_numero("Introduce el precio: ", float, minimo=0)
