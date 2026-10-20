@@ -4,14 +4,14 @@
 
 from pathlib import Path
 from funciones_python import (
-    validar_numero,
     validar_texto,
     encontrar_por_campo,
     agregar_objeto,
     modificar_campo,
     buscar_texto,
     guardar_csv,
-    pedir_si_no
+    pedir_si_no,
+    cargar_csv
 )
 
 RUTA_CSV = Path(__file__).with_name("clientes.csv")
@@ -28,12 +28,19 @@ def formatear_cliente(numero, cliente):
         f"\n--- {numero}. {cliente['nombre']} ---\nEmail: {cliente['email']}\nCiudad: {cliente['ciudad']}\nActivo: {cliente['activo']}"
     )
 
+def convertir_clientes(filas):
+    clientes = []
+    for fila in filas:
+        clientes.append({
+            "nombre": fila["nombre"],
+            "email": fila["email"],
+            "ciudad": fila["ciudad"],
+            "activo": fila["activo"].strip().lower() == "true",
+        })
+    return clientes
+
 def main():
-    clientes = [
-        {"nombre": "Álvaro", "email": "email1@proton.me", "ciudad": "Santa Cruz de Tenerife", "activo": True},
-        {"nombre": "Marta", "email": "email2@proton.me", "ciudad": "Badalona", "activo": False},
-        {"nombre": "Andrés", "email": "email3@proton.me", "ciudad": "Zarautz", "activo": True}
-    ]
+    clientes = convertir_clientes(cargar_csv(RUTA_CSV))  # Recupera lo guardado
     opcion = ""
     while opcion != "0":
         print("\n1) Dar cliente de alta")
@@ -55,15 +62,14 @@ def main():
                 print("Ya existe un cliente con ese nombre.")
             else:
                 while email == None:
-                    email, error = validar_texto(input("Introduce el nombre del cliente: "))
+                    email, error = validar_texto(input("Introduce el email del cliente: "))
                     if error != "":
                         print(error)
                     ciudad = None
-                    while ciudad == None:
-                        ciudad, error = validar_texto(input("Introduce la ciudad del cliente: "))
-                        if error != "":
-                            print(error)
-
+                while ciudad == None:
+                    ciudad, error = validar_texto(input("Introduce la ciudad del cliente: "))
+                    if error != "":
+                        print(error)
                 activo = pedir_si_no("¿Quieres marcarlo como \"activo\"? (s/n): ")
                 nuevo = {"nombre": nombre, "email": email, "ciudad": ciudad, "activo": activo}
                 if agregar_objeto(clientes, nuevo, "nombre") == "agregado":
@@ -74,21 +80,30 @@ def main():
                 print("No hay clientes.")
             for linea in listar_clientes(clientes):
                 print(linea)
-                
+        
         elif opcion == "3":
             texto = input("Introduce el nombre a buscar: ").strip()
             encontrados = buscar_texto(clientes, "nombre", texto)
             if len(encontrados) == 0:
-                print("No hay clientes.")
+                print("No hay clientes que coincidan.")
             for linea in listar_clientes(encontrados):
                 print(linea)
+        
         elif opcion == "4":
-            pass
+            nombre = input("Introduce el nombre del cliente a desactivar: ").strip()
+            if modificar_campo(clientes, "nombre", nombre, "activo", False):
+                print("Cliente desactivado con éxito.")
+            else:
+                print("No se ha encontrado al cliente.")
+        
         elif opcion == "5":
             cantidad = guardar_csv(RUTA_CSV, clientes, CAMPOS)
-            print(f"Guardados {cantidad} clientes en {RUTA_CSV.name}.")
+            print(f"{cantidad} clientes guardados con éxito en {RUTA_CSV.name}.")
+        
         elif opcion == "6":
-            pass
+            clientes = convertir_clientes(cargar_csv(RUTA_CSV))
+            print(f"{len(clientes)} clientes cargados con éxito desde {RUTA_CSV.name}.")
+        
         elif opcion == "0":
             print("Programa finalizado.")
         else:
