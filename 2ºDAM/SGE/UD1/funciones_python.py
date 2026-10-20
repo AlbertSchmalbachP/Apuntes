@@ -1,10 +1,11 @@
 import csv
+from pathlib import Path
 
 # Librería de funciones Python básicas para examen
 
 #* VALIDACION
 
-# Valida el numero segun tipo maximo y minimo (opcional)
+# Valida un número según tipo (int/float), mínimo y máximo (opcionales)
 def validar_numero(texto, tipo, minimo=None, maximo=None):
     valor = None
     error = ""
@@ -12,14 +13,14 @@ def validar_numero(texto, tipo, minimo=None, maximo=None):
         valor = tipo(texto.strip())
         if minimo != None and valor < minimo:
             error = f"El valor no puede ser menor que {minimo}."
-        elif maximo is not None and valor > maximo:
+        elif maximo != None and valor > maximo:
             error = f"El valor no puede ser mayor que {maximo}."
     except ValueError:
         error = "Introduce un valor válido."
     if error != "":
         valor = None
     return valor, error
-#? ejemplo uso: 
+#? ejemplo uso:
 #   edad = None
 #   while edad == None:
 #       edad, error = validar_numero(input("Introduce una edad: "), int, 0, 120)
@@ -27,6 +28,7 @@ def validar_numero(texto, tipo, minimo=None, maximo=None):
 #           print(error)
 
 
+# Valida que el texto no esté vacío
 def validar_texto(texto):
     valor = texto.strip()
     error = ""
@@ -36,42 +38,26 @@ def validar_texto(texto):
     return valor, error
 #? ejemplo uso:
 #   nombre = None
-#   while nombre is None:
+#   while nombre == None:
 #       nombre, error = validar_texto(input("Introduce un nombre: "))
 #       if error != "":
 #           print(error)
 
 
+# Pide s o n. Devuelve True si es "s", False si es "n"
+# No hace f
 def pedir_si_no(mensaje):
     respuesta = ""
     while respuesta != "s" and respuesta != "n":
-        respuesta = input(mensaje + " (s/n): ").strip().lower()
+        respuesta = input(mensaje).strip().lower()
     return respuesta == "s"
+#? ejemplo uso:
+#   if pedir_si_no("¿Quieres guardar? (s/n): "):
+#       print("Guardado")
 
 
 
-#* CONVERSION
-
-def convertir_entero(texto, minimo=0):
-    resultado = None
-    try:
-        numero = int(texto)
-        if numero >= minimo:
-            resultado = numero
-    except ValueError:
-        resultado = None
-    return resultado
-
-
-def convertir_precio(texto):
-    resultado = None
-    try:
-        precio = float(texto)
-        if precio >= 0:
-            resultado = precio
-    except ValueError:
-        resultado = None
-    return resultado
+#* CALCULOS
 
 def calcular_subtotal(precio, cantidad):
     return precio * cantidad
@@ -99,7 +85,7 @@ def calcular_media(numeros):
 
 #* DICCIONARIOS
 
-# Encuentra el primer diccionario cuyo campo coincida
+# Encuentra el primer diccionario que coincida, o None
 def encontrar_por_campo(items, campo, valor):
     encontrado = None
     for item in items:
@@ -108,13 +94,13 @@ def encontrar_por_campo(items, campo, valor):
     return encontrado
 
 
-# Lista elementos cuyo campo contiene el texto
+# Lista los diccionarios cuyo campo contiene el texto
 def buscar_texto(items, campo, texto):
     busqueda = texto.casefold()
     return [item for item in items if busqueda in str(item[campo]).casefold()]
 
 
-# Agrega el objecto si no esa ya en el diccionario
+# Agrega el diccionario si no hay otro con la misma clave. Devuelve "agregado" o "duplicado"
 def agregar_objeto(items, item, campo_clave):
     resultado = "duplicado"
     if encontrar_por_campo(items, campo_clave, item[campo_clave]) is None:
@@ -123,6 +109,7 @@ def agregar_objeto(items, item, campo_clave):
     return resultado
 
 
+# Cambia un campo del elemento encontrado por su clave. Devuelve True si lo encontró
 def modificar_campo(items, campo_clave, valor_clave, campo, nuevo_valor):
     item = encontrar_por_campo(items, campo_clave, valor_clave)
     modificado = False
@@ -132,6 +119,7 @@ def modificar_campo(items, campo_clave, valor_clave, campo, nuevo_valor):
     return modificado
 
 
+# Elimina el elemento encontrado por su clave. Devuelve True si lo encontró
 def eliminar_item(items, campo_clave, valor_clave):
     item = encontrar_por_campo(items, campo_clave, valor_clave)
     eliminado = False
@@ -141,6 +129,7 @@ def eliminar_item(items, campo_clave, valor_clave):
     return eliminado
 
 
+# Suma el valor de un campo numérico de todos los elementos
 def sumar_campo(items, campo):
     return sum(item[campo] for item in items)
 
@@ -157,6 +146,7 @@ def maximo_por_campo(items, campo):
 
 #* FICHEROS
 
+# Guarda la lista de diccionarios en un CSV. Devuelve cuántos guardó
 def guardar_csv(nombre_archivo, items, campos):
     with open(nombre_archivo, "w", newline="", encoding="utf-8") as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=campos)
@@ -165,32 +155,30 @@ def guardar_csv(nombre_archivo, items, campos):
     return len(items)
 
 
+# Carga un CSV como lista de diccionarios (lista vacía si el archivo no existe)
 def cargar_csv(nombre_archivo):
     items = []
-    try:
+    if Path(nombre_archivo).exists():
         with open(nombre_archivo, "r", newline="", encoding="utf-8") as archivo:
             for fila in csv.DictReader(archivo):
                 items.append(dict(fila))
-    except FileNotFoundError:
-        items = []
-    return items   # números se deveulven como texto (conv. usando int()/float() fuera si necesario)
+    return items # números son deveultos como texto (conv. usando int()/float() fuera si es necesario)
 
 
+# Guarda una lista en un txt
 def guardar_txt(nombre_archivo, lineas):
     with open(nombre_archivo, "w", encoding="utf-8") as archivo:
         for linea in lineas:
             archivo.write(linea + "\n")
-    return len(lineas)
 
 
+# Lee un .txt como lista
 def leer_txt(nombre_archivo):
     lineas = []
-    try:
+    if Path(nombre_archivo).exists():
         with open(nombre_archivo, "r", encoding="utf-8") as archivo:
             for linea in archivo:
                 lineas.append(linea.strip())
-    except FileNotFoundError:
-        lineas = []
     return lineas
 
 
@@ -204,7 +192,7 @@ def main():
         print("\n1) Listar\n2)Añadir\n3)Eliminar\n0) Salir")
         opcion = input("Opción: ").strip()
         if opcion == "1":
-            for linea in listar_items(datos):
+            for linea in datos:
                 print(linea)
         elif opcion == "2":
             pass
