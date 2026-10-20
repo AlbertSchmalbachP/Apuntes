@@ -44,15 +44,21 @@ def validar_texto(texto):
 #           print(error)
 
 
-# Pide s o n. Devuelve True si es "s", False si es "n"
-# No hace f
-def pedir_si_no(mensaje):
-    respuesta = ""
-    while respuesta != "s" and respuesta != "n":
-        respuesta = input(mensaje).strip().lower()
-    return respuesta == "s"
+# Valida una respuesta s/n. Devuelve (True, "") si es "s", (False, "") si es "n" y (None, mensaje_error) si no es válida.
+def validar_si_no(respuesta):
+    respuesta = respuesta.strip().lower()
+    if respuesta == "s":
+        return True, ""
+    if respuesta == "n":
+        return False, ""
+    return None, "Responde solo con 's' o 'n'."
 #? ejemplo uso:
-#   if pedir_si_no("¿Quieres guardar? (s/n): "):
+#   guardar = None
+#   while guardar is None:
+#       guardar, error = validar_si_no(input("¿Quieres guardar? (s/n): "))
+#       if error != "":
+#           print(error)
+#   if guardar:
 #       print("Guardado")
 
 
