@@ -10,7 +10,7 @@ from funciones_python import (
     modificar_campo,
     buscar_texto,
     guardar_csv,
-    pedir_si_no,
+    validar_si_no,
     cargar_csv
 )
 
@@ -70,7 +70,14 @@ def main():
                     ciudad, error = validar_texto(input("Introduce la ciudad del cliente: "))
                     if error != "":
                         print(error)
-                activo = pedir_si_no("¿Quieres marcarlo como \"activo\"? (s/n): ")
+                guardar = None
+                while guardar is None:
+                    guardar, error = validar_si_no(input("¿Quieres guardar? (s/n): "))
+                    if error != "":
+                        print(error)
+                if guardar:
+                    print("Guardado")
+                activo = validar_si_no("¿Quieres marcarlo como \"activo\"? (s/n): ")
                 nuevo = {"nombre": nombre, "email": email, "ciudad": ciudad, "activo": activo}
                 if agregar_objeto(clientes, nuevo, "nombre") == "agregado":
                     print("Cliente agregado con éxito.")
