@@ -11,7 +11,7 @@ public class GestionBinariaProductos {
 
     public static void main(String[] args) {
 
-        Path archivo = Path.of("2ºDAM", "AccesoDatos", "UD1", "relacion3", "02_GestionBinaria", "datos", "productos.dat");
+        Path archivo = Path.of("2ºDAM", "AccesoDatos", "UD1", "relacion3", "03_ExportarXml", "datos", "productos.dat");
 
         // 1: comprobar que el archivo existe
         if (Files.notExists(archivo)) {
