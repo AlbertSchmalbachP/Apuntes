@@ -4,19 +4,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class GestorInscripciones {
     private static final String CABECERA = "id;persona;taller;plazas";
 
-    // TODO 1.1 - Leer el CSV en UTF-8, ignorar cabecera y validar TODAS las filas.
+    // 1.1 - Leer el CSV en UTF-8, ignorar cabecera y validar TODAS las filas.
     // Si el archivo no existe, devolver una lista vacía.
     // Si una fila es incorrecta o hay IDs duplicados, lanzar IOException.
     public static List<Inscripcion> cargar(Path archivo) throws IOException {
         // PASO 1: prepara la lista, recorre las filas del CSV y valida campos.
-        return new ArrayList<>();
+        List<String> lineasArchivo = Files.readAllLines(archivo);
+        // eliminar cabezeras
+        lineasArchivo.remove(0);
+        // Pasar strings a objetos
+        // Crear arrayList para meter los objetos
+        List<Inscripcion> inscripciones = new ArrayList<>();
+        int id, plazas;
+        String persona, taller;
+        // Por cada linea del archivo (que es una inscripcion), separamos los elementos por ";"
+        // y les asignamos su variable correspondiente. Después, utilizamos el constructor para
+        // convertirlos a objetos
+        for (String linea : lineasArchivo) {
+            String[] lineaString = linea.split(";", -1);
+            id = Integer.parseInt(lineaString[0]);
+            persona = lineaString[1];
+            taller = lineaString[2];
+            plazas = Integer.parseInt(lineaString[3]);
+            inscripciones.add(new Inscripcion(id, persona, taller, plazas));
+        }
+        return inscripciones;
     }
 
     // TODO 1.2 - Buscar por ID. Devolver la inscripción o null.
