@@ -39,7 +39,13 @@ public class GestorInscripciones {
     // TODO 1.2 - Buscar por ID. Devolver la inscripción o null.
     public static Inscripcion buscar(List<Inscripcion> lista, int id) {
         // PASO 2: recorre la lista y compara los ID.
-        return null;
+        Inscripcion inscripcionEncontrada = null;
+        for (Inscripcion inscripcion : lista) {
+            if (inscripcion.getId() == id) {
+                inscripcionEncontrada = inscripcion;
+            }
+        }
+        return inscripcionEncontrada;
     }
 
     // MÉTODO RESUELTO COMO EJEMPLO: no hay que modificarlo.
