@@ -12,7 +12,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class ExportarProductosXml {
-//? para que sirve el throws Exception?
     public static void main(String[] args) throws Exception {
 
         Path archivo = Path.of("2ºDAM", "AccesoDatos", "UD1", "relacion3", "02_GestionBinaria", "datos", "productos.xml");
