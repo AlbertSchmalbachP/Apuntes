@@ -9,7 +9,7 @@ import java.util.List;
 public class GestorInscripciones {
     private static final String CABECERA = "id;persona;taller;plazas";
 
-    // 1.1 - Leer el CSV en UTF-8, ignorar cabecera y validar TODAS las filas.
+    // TODO 1.1 - Leer el CSV en UTF-8, ignorar cabecera y validar TODAS las filas.
     // Si el archivo no existe, devolver una lista vacía.
     // Si una fila es incorrecta o hay IDs duplicados, lanzar IOException.
     public static List<Inscripcion> cargar(Path archivo) throws IOException {
