@@ -64,7 +64,16 @@ public class GestorInscripciones {
     // Crear copia antes de reescribir. Si no existe o plazas < 0, devolver false.
     public static boolean actualizarPlazas(Path archivo, int id, int plazas) throws IOException {
         // PASO 3: carga, busca, valida, crea copia y guarda.
-        return false;
+        List<Inscripcion> lista = cargar(archivo);
+        if (plazas < 0 || buscar(lista, id) == null) {
+            return false;
+        }
+        if (plazas == buscar(lista, id).getPlazas()) {
+            return false;
+        }
+        crearCopiaSiExiste(archivo);
+        guardarTodo(archivo, lista);
+        return true;
     }
 
     // TODO 1.4 - Eliminar el ID solicitado y conservar todos los demás.
@@ -77,7 +86,7 @@ public class GestorInscripciones {
     // TODO 1.5 - Restaurar archivo.csv.bak sobre archivo.csv.
     // La confirmación se pide en Main, NO aquí.
     public static boolean restaurar(Path archivo) throws IOException {
-        // PASO 5: localiza .bak y cópialo sobre el CSV.
+        // PASO 5: localiza .bak y cópialo sobre el CSV
         return false;
     }
 

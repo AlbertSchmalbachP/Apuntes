@@ -52,7 +52,12 @@ public class Main {
                             // TODO 1.6-A - Pedir ID y nuevas plazas, llamar a actualizarPlazas
                             // y mostrar un mensaje distinto según el boolean recibido.
                             // Solicita ID, plazas y muestra el resultado.
-                            System.out.println("TODO 1.6-A pendiente.");
+                            System.out.println("Introduce un ID: ");
+                            int id = Integer.parseInt(teclado.nextLine().trim());
+                            System.out.println("Introduce un número de plazas: ");
+                            int plazas = Integer.parseInt(teclado.nextLine().trim());
+                            boolean actualizar = GestorInscripciones.actualizarPlazas(archivo, id, plazas);
+                            System.out.println(actualizar ? "Plazas actualizadas." : "Datos incorrectos o plazas introducidas previamente tienen valor idéntico.");
                         }
                         case 5 -> {
                             // TODO 1.6-B - Pedir ID, eliminar y mostrar el resultado.
