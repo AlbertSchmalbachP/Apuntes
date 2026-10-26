@@ -6,32 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuardarProductosBinario {
-
     public static void main(String[] args) {
-
-        Path archivo = Path.of("2ºDAM", "AccesoDatos", "UD1", "resources", "productos.dat");
-
-        // 1: crear una lista con al menos cuatro Producto.
+        Path archivo = Path.of("datos", "productos.dat");
         List<Producto> productos = new ArrayList<>();
-        productos.add(new Producto(1, "RAM 8GB DDR4", 59.99, 25));
-        productos.add(new Producto(2, "Ratón Inalámbrico Logitech", 24.99, 40));
-        productos.add(new Producto(3, "Ryzen 7 5800X\"", 189.99, 12));
-        productos.add(new Producto(4, "Ventiladores de hidrógeno líquido", 74999.99, 1));
+        productos.add(new Producto(1, "Teclado", 59.90, 8));
+        productos.add(new Producto(2, "Ratón", 24.50, 15));
+        productos.add(new Producto(3, "Monitor", 219.00, 4));
+        productos.add(new Producto(4, "Memoria USB", 14.95, 30));
 
         try {
-            // 2: crear la carpeta datos si hace falta.
             Files.createDirectories(archivo.getParent());
-            
-            // 3: guardar la lista completa con ObjectOutputStream.
-            try (ObjectOutputStream salida = new ObjectOutputStream(
-                    Files.newOutputStream(archivo))) {
+            // No se usa APPEND: se sustituye la lista completa.
+            try (ObjectOutputStream salida =
+                    new ObjectOutputStream(Files.newOutputStream(archivo))) {
                 salida.writeObject(productos);
             }
-            System.out.println("Productos guardados en " + archivo.toAbsolutePath());
-
-        // 4: controlar IOException.
+            if (Files.exists(archivo) && Files.size(archivo) > 0) {
+                System.out.println("Guardados " + productos.size() + " productos en " + archivo);
+                System.out.println("Tamaño: " + Files.size(archivo) + " bytes");
+            } else {
+                System.out.println("No se ha podido verificar el fichero de salida.");
+            }
         } catch (IOException e) {
-            System.err.println("Error al guardar: " + e.getMessage());
+            System.out.println("Error al guardar productos: " + e.getMessage());
         }
     }
 }

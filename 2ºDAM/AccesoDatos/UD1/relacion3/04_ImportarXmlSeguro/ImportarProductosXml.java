@@ -1,63 +1,82 @@
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class ImportarProductosXml {
-
     public static void main(String[] args) {
+        List<Producto> productosActuales = new ArrayList<>();
+        productosActuales.add(new Producto(99, "Producto existente", 10.0, 1));
 
-        Path correctos = Path.of("2ºDAM", "AccesoDatos", "UD1", "relacion3", "04_ImportarXmlSeguro", "datos", "productos_correctos.xml");
-        Path erroneos = Path.of("2ºDAM", "AccesoDatos", "UD1", "relacion3", "04_ImportarXmlSeguro", "datos", "productos_erroneos.xml");
-        for (Path archivo : List.of(correctos, erroneos)) {
-            List<Producto> productosActuales = new ArrayList<>();
-            productosActuales.add(new Producto(99, "Producto existente", 10.0, 1));
+        Path correcto = Path.of("datos", "productos_correctos.xml");
+        Path erroneo = Path.of("datos", "productos_erroneos.xml");
+        for (Path archivo : List.of(correcto, erroneo)) {
+            System.out.println("\nImportando " + archivo + "...");
             try {
-                //  1: comprobar Files.exists(...).
-                if (Files.notExists(archivo)) {
-                    System.out.println("El archivo no existe.");
-                } else {
-                    // 2: configurar DocumentBuilderFactory desactivando DTD y entidades externas.
-                    DocumentBuilderFactory fabrica = DocumentBuilderFactory.newInstance();
-                    fabrica.setFeature(
-                    "http://apache.org/xml/features/disallow-doctype-decl",
-                    true);
-                    fabrica.setFeature(
-                    "http://xml.org/sax/features/external-general-entities",
-                    false);
-                    fabrica.setFeature(
-                    "http://xml.org/sax/features/external-parameter-entities",
-                    false);
-                    fabrica.setXIncludeAware(false);
-                    fabrica.setExpandEntityReferences(false);
-                    Document documento = fabrica.newDocumentBuilder().parse(archivo.toFile());
-                    NodeList elementos = documento.getElementsByTagName("producto");
-                    Element raiz = documento.getDocumentN
-                    List<Producto> importados = new ArrayList<>();
-                    // 3: leer y validar todo en una lista temporal.
-                    for (int i = 0; i < elementos.getLength(); i++) {
-                        Element productoXml = (Element) elementos.item(i);
-                        NodeList nombres = productoXml.getElementsByTagName("nombre");
-                        NodeList precios = productoXml.getElementsByTagName("precio");
-                        NodeList stocks = productoXml.getElementsByTagName("stock");
-                        if (nombres.getLength() != 1 || precios.getLength() != 1 || stocks.getLength() != 1) {
-                            throw new IllegalArgumentException("Faltan campos en el producto " + (i + 1));
-                        }
-                        int id = Integer.parseInt(productoXml.getAttribute("id"));
-                        String nombre = nombres.item
-                    }
-                    // TODO 4: comprobar IDs duplicados.
-                    // TODO 5: sustituir productosActuales solo si TODO el XML es válido.
-                }
+                List<Producto> temporales = importar(archivo);
+                productosActuales = temporales; // Solo se cambia tras validar TODO.
+                System.out.println("Importación correcta.");
             } catch (Exception e) {
-                System.err.println("No se pudo importar.");
+                System.out.println("Importación rechazada: " + e.getMessage());
             }
+            System.out.println("Lista en memoria:");
+            productosActuales.forEach(System.out::println);
         }
+    }
+
+    private static List<Producto> importar(Path archivo) throws Exception {
+        if (!Files.exists(archivo)) {
+            throw new IllegalArgumentException("No existe el archivo: " + archivo);
+        }
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        Document documento = factory.newDocumentBuilder().parse(archivo.toFile());
+        Element raiz = documento.getDocumentElement();
+        if (raiz == null || !"productos".equals(raiz.getTagName())) {
+            throw new IllegalArgumentException("La raíz debe ser <productos>.");
+        }
+
+        List<Producto> temporales = new ArrayList<>();
+        Set<Integer> ids = new HashSet<>();
+        NodeList nodos = raiz.getChildNodes();
+        for (int i = 0; i < nodos.getLength(); i++) {
+            if (!(nodos.item(i) instanceof Element elemento)) {
+                continue;
+            }
+            if (!"producto".equals(elemento.getTagName())) {
+                throw new IllegalArgumentException("Etiqueta inesperada en productos.");
+            }
+            int id = Integer.parseInt(elemento.getAttribute("id"));
+            String nombre = texto(elemento, "nombre").trim();
+            double precio = Double.parseDouble(texto(elemento, "precio"));
+            int stock = Integer.parseInt(texto(elemento, "stock"));
+            if (id <= 0 || nombre.isEmpty() || !Double.isFinite(precio)
+                    || precio < 0 || stock < 0 || !ids.add(id)) {
+                throw new IllegalArgumentException("Datos inválidos o ID repetido: " + id);
+            }
+            temporales.add(new Producto(id, nombre, precio, stock));
+        }
+        return temporales;
+    }
+
+    private static String texto(Element padre, String etiqueta) {
+        NodeList nodos = padre.getElementsByTagName(etiqueta);
+        if (nodos.getLength() != 1) {
+            throw new IllegalArgumentException("Debe existir un único <" + etiqueta + ">.");
+        }
+        return nodos.item(0).getTextContent();
     }
 }
