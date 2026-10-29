@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/fondo_app">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:orientation="vertical">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Boletín de evaluación" style="@style/TituloPantalla" />
+        <EditText android:id="@+id/etBloque1" style="@style/CampoFormulario"
+            android:hint="Bloque 1 (20 %)" android:inputType="numberDecimal|numberSigned" />
+        <EditText android:id="@+id/etBloque2" style="@style/CampoFormulario"
+            android:hint="Bloque 2 (30 %)" android:inputType="numberDecimal|numberSigned" />
+        <EditText android:id="@+id/etBloque3" style="@style/CampoFormulario"
+            android:hint="Bloque 3 (50 %)" android:inputType="numberDecimal|numberSigned" />
+        <Button android:id="@+id/btnEvaluar" style="@style/BotonPrincipal" android:text="Evaluar" />
+        <Button android:id="@+id/btnLimpiar" style="@style/BotonSecundario" android:text="Limpiar" />
+        <TextView android:id="@+id/tvNota" style="@style/TextoResultado"
+            android:text="Introduce las tres notas." />
+        <TextView android:id="@+id/tvEstado" style="@style/TextoResultado"
+            android:text="" />
+    </LinearLayout>
+</ScrollView>

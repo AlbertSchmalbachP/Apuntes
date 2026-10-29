@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/fondo_app">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:orientation="vertical">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Reto final: reservas con aforo" style="@style/TituloPantalla" />
+        <EditText android:id="@+id/etNombre" style="@style/CampoFormulario"
+            android:hint="Nombre de la reserva" android:inputType="textPersonName" />
+        <EditText android:id="@+id/etCantidad" style="@style/CampoFormulario"
+            android:hint="Número de entradas (1-8)" android:inputType="numberSigned" />
+        <RadioGroup android:id="@+id/rgEntrada"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/rbGeneral" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="General (18 €)" />
+            <RadioButton android:id="@+id/rbVip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VIP (32 €)" />
+        </RadioGroup>
+        <CheckBox android:id="@+id/cbFinSemana"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Fin de semana (+20 %)" />
+        <EditText android:id="@+id/etCodigo" style="@style/CampoFormulario"
+            android:hint="Código promocional (opcional)" android:inputType="textCapCharacters" />
+        <Button android:id="@+id/btnReservar" style="@style/BotonPrincipal" android:text="Confirmar reserva" />
+        <Button android:id="@+id/btnLimpiar" style="@style/BotonSecundario" android:text="Limpiar formulario" />
+        <TextView android:id="@+id/tvPlazas" style="@style/TextoResultado" android:background="@drawable/fondo_panel"
+            android:text="Plazas disponibles: 20" />
+        <TextView android:id="@+id/tvResumen" style="@style/TextoResultado" android:background="@drawable/fondo_panel"
+            android:text="Todavía no hay reservas." />
+    </LinearLayout>
+</ScrollView>
