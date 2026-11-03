@@ -20,7 +20,6 @@ public class Main {
                         opcion = Integer.parseInt(teclado.nextLine().trim());
                         switch (opcion) {
                             case 1 -> {
-                                // EJEMPLO COMPLETO: Main muestra resultados.
                                 if (equipos.isEmpty()) {
                                     System.out.println("No hay equipos.");
                                 }
@@ -29,32 +28,32 @@ public class Main {
                                 }
                             }
                             case 2 -> {
-                                // EJEMPLO COMPLETO: consulta en memoria.
                                 System.out.print("ID que buscas: ");
                                 int id = Integer.parseInt(teclado.nextLine().trim());
                                 Equipo encontrado = RepositorioEquipos.buscar(equipos, id);
                                 System.out.println(encontrado == null ? "ID no encontrado." : encontrado);
                             }
                             case 3 -> {
-                                // TODO 2.5-A: pedir ID y unidades, llamar a cambiarUnidades,
-                                // e informar al usuario desde aquí (nunca desde el repositorio).
-                                // Pide ID, unidades y llama al repositorio.
-                                System.out.println("TODO 2.5-A pendiente.");
+                                System.out.print("ID del equipo: ");
+                                int id = Integer.parseInt(teclado.nextLine().trim());
+                                System.out.print("Nuevas unidades: ");
+                                int unidades = Integer.parseInt(teclado.nextLine().trim());
+                                boolean cambiado = RepositorioEquipos.cambiarUnidades(equipos, id, unidades);
+                                System.out.println(cambiado
+                                        ? "Unidades actualizadas en memoria. Usa la opción 4 para guardar."
+                                        : "ID no encontrado o unidades negativas. La lista no se modifica.");
                             }
                             case 4 -> {
-                                // EJEMPLO COMPLETO: guardado explícito.
                                 RepositorioEquipos.guardar(binario, equipos);
                                 System.out.println("Lista guardada en binario.");
                             }
                             case 5 -> {
-                                // TODO 2.5-B: reemplazar equipos por cargar(binario).
-                                // Recarga la lista desde el fichero.
-                                System.out.println("TODO 2.5-B pendiente.");
+                                equipos = RepositorioEquipos.cargar(binario);
+                                System.out.println("Lista recargada desde el binario.");
                             }
                             case 6 -> {
-                                // TODO 2.5-C: llamar a exportarXml(xml, equipos).
-                                // Exporta la lista a XML.
-                                System.out.println("TODO 2.5-C pendiente.");
+                                RepositorioEquipos.exportarXml(xml, equipos);
+                                System.out.println("XML exportado en " + xml + ".");
                             }
                             case 0 -> System.out.println("Hasta luego.");
                             default -> System.out.println("Opción desconocida.");
