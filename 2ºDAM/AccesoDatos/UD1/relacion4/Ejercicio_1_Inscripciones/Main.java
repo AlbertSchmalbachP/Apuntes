@@ -60,9 +60,12 @@ public class Main {
                             System.out.println(actualizar ? "Plazas actualizadas." : "Datos incorrectos o plazas introducidas previamente tienen valor idéntico.");
                         }
                         case 5 -> {
-                            // TODO 1.6-B - Pedir ID, eliminar y mostrar el resultado.
+                            // 1.6-B - Pedir ID, eliminar y mostrar el resultado.
                             // Solicita ID para eliminar y muestra el resultado.
-                            System.out.println("TODO 1.6-B pendiente.");
+                            System.out.println("Introduce un ID: ");
+                            int id = Integer.parseInt(teclado.nextLine().trim());
+                            boolean eliminado = GestorInscripciones.eliminar(archivo, id);
+                            System.out.println(eliminado ? "Registro eliminado." : "No existe el ID " + id + ".");
                         }
                         case 6 -> {
                             // 1.6-C - Pedir confirmación S/N antes de restaurar.
