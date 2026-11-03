@@ -3,6 +3,9 @@
 Funciones para copiar en el examen. Cada bloque indica cuándo usarlo.
 Formato de registro en TXT/CSV: `id;campo2;campo3`, un registro por línea.
 
+Estilo: las funciones son `public static`, reciben el `Path` y lanzan `IOException`.
+No usan `System.out` ni `Scanner`: devuelven `boolean`, `null`, una lista o un valor. Los mensajes se muestran en `Main`.
+
 ---
 
 ## 0. Plantilla inicial menú
@@ -107,15 +110,11 @@ try (Scanner escaner = new Scanner(System.in)) {
 **Cuándo:** al arrancar el programa, antes de leer o escribir.
 
 ```java
-Path carpeta = Path.of("datos");
-Path archivo = carpeta.resolve("clubes.txt");
-try {
-    Files.createDirectories(carpeta);
+public static void crearArchivoSiNoExiste(Path archivo) throws IOException {
+    Files.createDirectories(archivo.getParent());
     if (Files.notExists(archivo)) {
         Files.createFile(archivo);
     }
-} catch (IOException e) {
-    System.out.println("No se pudo acceder al archivo: " + e.getMessage());
 }
 ```
 
@@ -140,14 +139,24 @@ archivo.toAbsolutePath();              // ruta completa, no comprueba que exista
 **Cuándo:** para ver qué hay dentro de un directorio.
 
 ```java
-try (DirectoryStream<Path> elementos = Files.newDirectoryStream(carpeta)) {
-    for (Path elemento : elementos) {
-        if (Files.isRegularFile(elemento)) {
-            System.out.println(elemento.getFileName());
+public static List<String> listarArchivos(Path carpeta) throws IOException {
+    List<String> nombres = new ArrayList<>();
+    try (DirectoryStream<Path> elementos = Files.newDirectoryStream(carpeta)) {
+        for (Path elemento : elementos) {
+            if (Files.isRegularFile(elemento)) {
+                nombres.add(elemento.getFileName().toString());
+            }
         }
     }
-} catch (IOException e) {
-    System.out.println(e.getMessage());
+    return nombres;
+}
+```
+
+**En `Main`:**
+
+```java
+for (String nombre : listarArchivos(carpeta)) {
+    System.out.println(nombre);
 }
 ```
 
@@ -159,11 +168,13 @@ try (DirectoryStream<Path> elementos = Files.newDirectoryStream(carpeta)) {
 **Cuándo:** crear un archivo nuevo o reemplazar todo su contenido.
 
 ```java
-try (BufferedWriter salida = Files.newBufferedWriter(ruta, StandardCharsets.UTF_8)) {
-    salida.write("1;Granada CF;Granada");
-    salida.newLine();
-} catch (IOException e) {
-    System.out.println("No se pudo guardar: " + e.getMessage());
+public static void escribirLineas(Path ruta, List<String> lineas) throws IOException {
+    try (BufferedWriter salida = Files.newBufferedWriter(ruta, StandardCharsets.UTF_8)) {
+        for (String linea : lineas) {
+            salida.write(linea);
+            salida.newLine();
+        }
+    }
 }
 ```
 
@@ -171,30 +182,43 @@ try (BufferedWriter salida = Files.newBufferedWriter(ruta, StandardCharsets.UTF_
 **Cuándo:** altas. Java no evita duplicados, se validan antes.
 
 ```java
-try (BufferedWriter salida = Files.newBufferedWriter(ruta, StandardCharsets.UTF_8,
-        StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-    salida.write(id + ";" + nombre + ";" + ciudad);
-    salida.newLine();
-} catch (IOException e) {
-    System.out.println("No se pudo añadir: " + e.getMessage());
+public static void anadirLinea(Path ruta, String linea) throws IOException {
+    try (BufferedWriter salida = Files.newBufferedWriter(ruta, StandardCharsets.UTF_8,
+            StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+        salida.write(linea);
+        salida.newLine();
+    }
 }
 ```
 
 ### Leer línea a línea
-**Cuándo:** recorrer el archivo una sola vez sin guardarlo en memoria.
+**Cuándo:** recorrer el archivo una sola vez. Si no existe, devuelve una lista vacía.
 
 ```java
-if (Files.notExists(ruta)) {
-    System.out.println("Todavía no hay archivo.");
-    return;
-}
-try (BufferedReader entrada = Files.newBufferedReader(ruta, StandardCharsets.UTF_8)) {
-    String linea;
-    while ((linea = entrada.readLine()) != null) {
-        System.out.println(linea);
+public static List<String> leerLineas(Path ruta) throws IOException {
+    List<String> lineas = new ArrayList<>();
+    if (Files.notExists(ruta)) {
+        return lineas;
     }
-} catch (IOException e) {
-    System.out.println("No se pudo leer: " + e.getMessage());
+    try (BufferedReader entrada = Files.newBufferedReader(ruta, StandardCharsets.UTF_8)) {
+        String linea;
+        while ((linea = entrada.readLine()) != null) {
+            lineas.add(linea);
+        }
+    }
+    return lineas;
+}
+```
+
+**En `Main`:**
+
+```java
+List<String> lineas = leerLineas(ruta);
+if (lineas.isEmpty()) {
+    System.out.println("Todavía no hay datos.");
+}
+for (String linea : lineas) {
+    System.out.println(linea);
 }
 ```
 
@@ -217,19 +241,32 @@ Files.write(ruta, nuevas, StandardCharsets.UTF_8);
 ## 3. Interpretar un registro
 
 ### Separar campos y convertir el ID
-**Cuándo:** siempre que se procesa una línea.
+**Cuándo:** siempre que se procesa una línea. Devuelve `null` si la línea no es válida.
+`Club` es la clase del tema con `id`, `nombre` y `ciudad`.
 
 ```java
-String[] campos = linea.split(";", -1);    // -1 conserva campos vacíos al final
-if (campos.length == 3) {
+public static Club convertirLinea(String linea) {
+    String[] campos = linea.split(";", -1);    // -1 conserva campos vacíos al final
+    if (campos.length != 3) {
+        return null;
+    }
     try {
         int id = Integer.parseInt(campos[0].trim());
-        String nombre = campos[1].trim();
-        String ciudad = campos[2].trim();
-        System.out.println("[" + id + "] " + nombre + " - " + ciudad);
+        return new Club(id, campos[1].trim(), campos[2].trim());
     } catch (NumberFormatException e) {
-        System.out.println("El ID no es un número válido.");
+        return null;
     }
+}
+```
+
+**En `Main`:**
+
+```java
+Club club = convertirLinea(linea);
+if (club == null) {
+    System.out.println("La línea tiene un formato incorrecto.");
+} else {
+    System.out.println(club);
 }
 ```
 
@@ -244,7 +281,7 @@ for (int i = 1; i < lineas.size(); i++) {      // empieza en 1, la línea 0 es l
 ```
 
 ### Leer un número por teclado distinguiendo errores
-**Cuándo:** pedir un ID y diferenciar "no es número" de "no existe".
+**Cuándo:** en `Main`, pedir un ID y diferenciar "no es número" de "no existe".
 
 ```java
 Scanner teclado = new Scanner(System.in);
@@ -263,79 +300,109 @@ if (!idValido) {
 }
 ```
 
+Si el menú ya tiene `catch (NumberFormatException e)` exterior, basta con una línea:
+
+```java
+int id = Integer.parseInt(teclado.nextLine().trim());
+```
+
 ---
 
 ## 4. CRUD en fichero de texto
 
 Patrón: **leer todo → cambiar en memoria → escribir todo**. Solo se escribe si el registro existe.
+Las funciones devuelven el resultado y `Main` muestra el mensaje.
 
 ### Consulta por ID
-**Cuándo:** buscar un registro sin modificar el archivo.
+**Cuándo:** buscar un registro sin modificar el archivo. Devuelve los campos o `null`.
 
 ```java
-List<String> lineas = Files.readAllLines(ruta, StandardCharsets.UTF_8);
-boolean encontrado = false;
-for (String linea : lineas) {
-    String[] campos = linea.split(";", -1);
-    if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
-        System.out.println("Nombre: " + campos[1] + " | Ciudad: " + campos[2]);
-        encontrado = true;
+public static String[] buscarPorId(Path ruta, int id) throws IOException {
+    List<String> lineas = Files.readAllLines(ruta, StandardCharsets.UTF_8);
+    for (String linea : lineas) {
+        String[] campos = linea.split(";", -1);
+        if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
+            return campos;
+        }
     }
+    return null;
 }
-if (!encontrado) {
+```
+
+**En `Main`:**
+
+```java
+String[] campos = buscarPorId(ruta, id);
+if (campos == null) {
     System.out.println("No existe el ID " + id + ".");
+} else {
+    System.out.println("Nombre: " + campos[1] + " | Ciudad: " + campos[2]);
 }
 ```
 
 ### Modificación
-**Cuándo:** cambiar un campo de un registro. El resto de líneas pasan sin cambios.
+**Cuándo:** cambiar un campo de un registro. El resto de líneas pasan sin cambios. Devuelve `false` si el ID no existe.
 
 ```java
-List<String> originales = Files.readAllLines(ruta, StandardCharsets.UTF_8);
-List<String> nuevas = new ArrayList<>();
-boolean encontrado = false;
-for (String linea : originales) {
-    String[] campos = linea.split(";", -1);
-    if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
-        nuevas.add(campos[0] + ";" + campos[1] + ";" + nuevaCiudad);
-        encontrado = true;
-    } else {
-        nuevas.add(linea);
+public static boolean cambiarCiudad(Path ruta, int id, String nuevaCiudad) throws IOException {
+    List<String> originales = Files.readAllLines(ruta, StandardCharsets.UTF_8);
+    List<String> nuevas = new ArrayList<>();
+    boolean encontrado = false;
+    for (String linea : originales) {
+        String[] campos = linea.split(";", -1);
+        if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
+            nuevas.add(campos[0] + ";" + campos[1] + ";" + nuevaCiudad);
+            encontrado = true;
+        } else {
+            nuevas.add(linea);
+        }
     }
+    if (encontrado) {
+        Files.write(ruta, nuevas, StandardCharsets.UTF_8);
+    }
+    return encontrado;
 }
-if (encontrado) {
-    Files.write(ruta, nuevas, StandardCharsets.UTF_8);
-    System.out.println("Registro actualizado.");
-} else {
-    System.out.println("No existe el ID " + id + ".");
-}
+```
+
+**En `Main`:**
+
+```java
+boolean cambiada = cambiarCiudad(ruta, id, nuevaCiudad);
+System.out.println(cambiada ? "Registro actualizado." : "No existe el ID " + id + ".");
 ```
 
 ### Baja
-**Cuándo:** eliminar un registro. Se construye una lista sin esa línea.
+**Cuándo:** eliminar un registro. Se construye una lista sin esa línea. Devuelve `false` si el ID no existe.
 
 ```java
-List<String> originales = Files.readAllLines(ruta, StandardCharsets.UTF_8);
-List<String> nuevas = new ArrayList<>();
-boolean encontrado = false;
-for (String linea : originales) {
-    String[] campos = linea.split(";", -1);
-    if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
-        encontrado = true;
-    } else {
-        nuevas.add(linea);
+public static boolean eliminar(Path ruta, int id) throws IOException {
+    List<String> originales = Files.readAllLines(ruta, StandardCharsets.UTF_8);
+    List<String> nuevas = new ArrayList<>();
+    boolean encontrado = false;
+    for (String linea : originales) {
+        String[] campos = linea.split(";", -1);
+        if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
+            encontrado = true;
+        } else {
+            nuevas.add(linea);
+        }
     }
-}
-if (encontrado) {
-    Files.write(ruta, nuevas, StandardCharsets.UTF_8);
-    System.out.println("Registro eliminado.");
-} else {
-    System.out.println("No existe el ID " + id + ".");
+    if (encontrado) {
+        Files.write(ruta, nuevas, StandardCharsets.UTF_8);
+    }
+    return encontrado;
 }
 ```
 
+**En `Main`:**
+
+```java
+boolean eliminado = eliminar(ruta, id);
+System.out.println(eliminado ? "Registro eliminado." : "No existe el ID " + id + ".");
+```
+
 ### Baja conservando la cabecera
-**Cuándo:** el CSV tiene cabecera. La línea 0 siempre se añade.
+**Cuándo:** el CSV tiene cabecera. La línea 0 siempre se añade. Sustituye el bucle de `eliminar`.
 
 ```java
 for (int i = 0; i < originales.size(); i++) {
@@ -350,28 +417,30 @@ for (int i = 0; i < originales.size(); i++) {
 ```
 
 ### Alta sin duplicados
-**Cuándo:** antes de añadir. Comprueba ID repetido y título repetido sin importar mayúsculas ni espacios.
+**Cuándo:** antes de añadir. Comprueba ID repetido y título repetido sin importar mayúsculas ni espacios. Devuelve `false` si hay duplicado.
 
 ```java
-List<String> lineas = Files.readAllLines(ruta, StandardCharsets.UTF_8);
-boolean repetido = false;
-for (String linea : lineas) {
-    String[] campos = linea.split(";", -1);
-    if (campos.length == 3) {
-        if (campos[0].trim().equals(String.valueOf(id))
-                || campos[1].trim().equalsIgnoreCase(titulo.trim())) {
-            repetido = true;
+public static boolean anadirSinDuplicados(Path ruta, int id, String titulo, String autor) throws IOException {
+    List<String> lineas = Files.readAllLines(ruta, StandardCharsets.UTF_8);
+    boolean repetido = false;
+    for (String linea : lineas) {
+        String[] campos = linea.split(";", -1);
+        if (campos.length == 3) {
+            if (campos[0].trim().equals(String.valueOf(id))
+                    || campos[1].trim().equalsIgnoreCase(titulo.trim())) {
+                repetido = true;
+            }
         }
     }
-}
-if (repetido) {
-    System.out.println("El ID o el título ya existen.");
-} else {
+    if (repetido) {
+        return false;
+    }
     try (BufferedWriter salida = Files.newBufferedWriter(ruta, StandardCharsets.UTF_8,
             StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
         salida.write(id + ";" + titulo.trim() + ";" + autor.trim());
         salida.newLine();
     }
+    return true;
 }
 ```
 
@@ -379,12 +448,22 @@ if (repetido) {
 **Cuándo:** antes de aceptar un alta o una modificación.
 
 ```java
-if (id <= 0) {
-    System.out.println("El ID debe ser mayor que cero.");
-} else if (titulo.trim().isEmpty() || autor.trim().isEmpty()) {
-    System.out.println("El título y el autor no pueden estar vacíos.");
-} else if (titulo.split(";", -1).length != 1) {
-    System.out.println("El texto no puede contener ';'.");   // rompería el formato
+public static boolean datosValidos(int id, String titulo, String autor) {
+    return id > 0 && !titulo.trim().isEmpty() && !autor.trim().isEmpty()
+            && titulo.split(";", -1).length == 1     // un ';' rompería el formato
+            && autor.split(";", -1).length == 1;
+}
+```
+
+**En `Main`:**
+
+```java
+if (!datosValidos(id, titulo, autor)) {
+    System.out.println("Datos incorrectos.");
+} else if (!anadirSinDuplicados(ruta, id, titulo, autor)) {
+    System.out.println("El ID o el título ya existen.");
+} else {
+    System.out.println("Libro añadido.");
 }
 ```
 
@@ -394,37 +473,52 @@ if (id <= 0) {
 
 ### Filtrar filas válidas y guardarlas en otro archivo
 **Cuándo:** el archivo de entrada tiene filas erróneas. Nunca se sobrescribe la entrada.
+Devuelve la lista de errores (número de línea y motivo) para que `Main` los muestre.
 
 ```java
-List<String> lineas = Files.readAllLines(entrada, StandardCharsets.UTF_8);
-List<String> validas = new ArrayList<>();
-Set<Integer> ids = new HashSet<>();
-for (int i = 1; i < lineas.size(); i++) {          // se salta la cabecera
-    String[] campos = lineas.get(i).split(";", -1);
-    if (campos.length != 3) {
-        System.out.println("Línea " + (i + 1) + ": número de campos incorrecto.");
-        continue;
-    }
-    try {
-        int id = Integer.parseInt(campos[0].trim());
-        String nombre = campos[1].trim();
-        int stock = Integer.parseInt(campos[2].trim());
-        if (id <= 0) {
-            System.out.println("Línea " + (i + 1) + ": ID no positivo.");
-        } else if (nombre.isEmpty()) {
-            System.out.println("Línea " + (i + 1) + ": nombre vacío.");
-        } else if (stock < 0) {
-            System.out.println("Línea " + (i + 1) + ": stock negativo.");
-        } else if (!ids.add(id)) {                  // add devuelve false si ya estaba
-            System.out.println("Línea " + (i + 1) + ": ID duplicado.");
-        } else {
-            validas.add(id + ";" + nombre + ";" + stock);
+public static List<String> importarValidos(Path entrada, Path salida) throws IOException {
+    List<String> lineas = Files.readAllLines(entrada, StandardCharsets.UTF_8);
+    List<String> validas = new ArrayList<>();
+    List<String> errores = new ArrayList<>();
+    Set<Integer> ids = new HashSet<>();
+    for (int i = 1; i < lineas.size(); i++) {          // se salta la cabecera
+        String[] campos = lineas.get(i).split(";", -1);
+        if (campos.length != 3) {
+            errores.add("Línea " + (i + 1) + ": número de campos incorrecto.");
+            continue;
         }
-    } catch (NumberFormatException e) {
-        System.out.println("Línea " + (i + 1) + ": ID o stock no numérico.");
+        try {
+            int id = Integer.parseInt(campos[0].trim());
+            String nombre = campos[1].trim();
+            int stock = Integer.parseInt(campos[2].trim());
+            if (id <= 0) {
+                errores.add("Línea " + (i + 1) + ": ID no positivo.");
+            } else if (nombre.isEmpty()) {
+                errores.add("Línea " + (i + 1) + ": nombre vacío.");
+            } else if (stock < 0) {
+                errores.add("Línea " + (i + 1) + ": stock negativo.");
+            } else if (!ids.add(id)) {                  // add devuelve false si ya estaba
+                errores.add("Línea " + (i + 1) + ": ID duplicado.");
+            } else {
+                validas.add(id + ";" + nombre + ";" + stock);
+            }
+        } catch (NumberFormatException e) {
+            errores.add("Línea " + (i + 1) + ": ID o stock no numérico.");
+        }
     }
+    Files.write(salida, validas, StandardCharsets.UTF_8);
+    return errores;
 }
-Files.write(salida, validas, StandardCharsets.UTF_8);
+```
+
+**En `Main`:**
+
+```java
+List<String> errores = importarValidos(entrada, salida);
+for (String error : errores) {
+    System.out.println(error);
+}
+System.out.println("Filas rechazadas: " + errores.size());
 ```
 
 ---
@@ -435,48 +529,60 @@ Files.write(salida, validas, StandardCharsets.UTF_8);
 **Cuándo:** antes de cualquier operación que reescriba el fichero.
 
 ```java
-Path copia = Path.of("datos", "copias", "inventario.bak");
-Files.createDirectories(copia.getParent());
-Files.copy(origen, copia, StandardCopyOption.REPLACE_EXISTING);
+public static void crearCopia(Path origen, Path copia) throws IOException {
+    Files.createDirectories(copia.getParent());
+    Files.copy(origen, copia, StandardCopyOption.REPLACE_EXISTING);
+}
 ```
 
 ### Restaurar con confirmación
-**Cuándo:** recuperar datos. Comprueba que existe, pide confirmación y guarda la versión que se sustituye.
+**Cuándo:** recuperar datos. La función comprueba que la copia existe y guarda la versión que se sustituye.
+La confirmación se pide en `Main`, nunca en la función. Devuelve `false` si no hay copia.
 
 ```java
-if (Files.notExists(copia)) {
-    System.out.println("No existe ninguna copia.");
-} else {
-    System.out.print("Se sustituirán los datos actuales. ¿Continuar? (s/n): ");
-    String respuesta = teclado.nextLine().trim();
-    if (respuesta.equalsIgnoreCase("s")) {
-        Files.copy(origen, copia.getParent().resolve("anterior.bak"),
-                StandardCopyOption.REPLACE_EXISTING);
-        Files.copy(copia, origen, StandardCopyOption.REPLACE_EXISTING);
-        System.out.println("Copia restaurada.");
-    } else {
-        System.out.println("Restauración cancelada.");
+public static boolean restaurar(Path origen, Path copia) throws IOException {
+    if (Files.notExists(copia)) {
+        return false;
     }
+    Files.copy(origen, copia.getParent().resolve("anterior.bak"),
+            StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(copia, origen, StandardCopyOption.REPLACE_EXISTING);
+    return true;
+}
+```
+
+**En `Main`:**
+
+```java
+System.out.print("Se sustituirán los datos actuales. ¿Continuar? (s/n): ");
+String respuesta = teclado.nextLine().trim();
+if (respuesta.equalsIgnoreCase("s")) {
+    boolean restaurada = restaurar(origen, copia);
+    System.out.println(restaurada ? "Copia restaurada." : "No existe ninguna copia.");
+} else {
+    System.out.println("Restauración cancelada.");
 }
 ```
 
 ### Comprobar que una copia es válida
 **Cuándo:** antes de restaurar, para no reemplazar datos por un archivo que no se puede interpretar.
+Esta versión no admite cabecera: con cabecera, el bucle empieza en 1.
 
 ```java
-List<String> lineasCopia = Files.readAllLines(copia, StandardCharsets.UTF_8);
-boolean copiaValida = true;
-for (String linea : lineasCopia) {
-    String[] campos = linea.split(";", -1);
-    if (campos.length != 3) {
-        copiaValida = false;
-    } else {
+public static boolean copiaValida(Path copia) throws IOException {
+    List<String> lineasCopia = Files.readAllLines(copia, StandardCharsets.UTF_8);
+    for (String linea : lineasCopia) {
+        String[] campos = linea.split(";", -1);
+        if (campos.length != 3) {
+            return false;
+        }
         try {
             Integer.parseInt(campos[0].trim());
         } catch (NumberFormatException e) {
-            copiaValida = false;
+            return false;
         }
     }
+    return true;
 }
 ```
 
@@ -525,65 +631,93 @@ public class Producto implements Serializable {
 **Cuándo:** siempre se guarda la lista entera como un único objeto, no objeto a objeto.
 
 ```java
-try (ObjectOutputStream salida = new ObjectOutputStream(Files.newOutputStream(archivo))) {
-    salida.writeObject(productos);
-} catch (IOException e) {
-    System.out.println("Error al guardar: " + e.getMessage());
+public static void guardar(Path archivo, List<Producto> productos) throws IOException {
+    Files.createDirectories(archivo.getParent());
+    try (ObjectOutputStream salida = new ObjectOutputStream(Files.newOutputStream(archivo))) {
+        salida.writeObject(productos);
+    }
 }
 ```
 
 ### Cargar la lista
-**Cuándo:** leer el binario. Comprueba el tipo de la lista y de cada elemento.
+**Cuándo:** leer el binario. Si no existe, devuelve una lista vacía. Comprueba el tipo de la lista y de cada elemento, los IDs y los duplicados.
+`ClassNotFoundException` se convierte en `IOException` para que `Main` solo capture una.
 
 ```java
-private static List<Producto> cargar(Path archivo) throws IOException, ClassNotFoundException {
+public static List<Producto> cargar(Path archivo) throws IOException {
+    List<Producto> productos = new ArrayList<>();
+    if (Files.notExists(archivo)) {
+        return productos;
+    }
     try (ObjectInputStream entrada = new ObjectInputStream(Files.newInputStream(archivo))) {
         Object objeto = entrada.readObject();
         if (!(objeto instanceof List<?> lista)) {
             throw new IOException("El fichero no contiene una lista.");
         }
-        List<Producto> productos = new ArrayList<>();
+        Set<Integer> ids = new HashSet<>();
         for (Object elemento : lista) {
             if (!(elemento instanceof Producto producto)) {
                 throw new IOException("La lista contiene un elemento que no es Producto.");
             }
+            if (producto.getId() <= 0 || !ids.add(producto.getId())) {
+                throw new IOException("ID inválido o duplicado: " + producto.getId());
+            }
             productos.add(producto);
         }
-        return productos;
+    } catch (ClassNotFoundException e) {
+        throw new IOException("No se encontró la clase del objeto: " + e.getMessage(), e);
     }
+    return productos;
 }
 ```
 
 ### Modificar un objeto y volver a guardar
-**Cuándo:** cambiar un dato. Se carga todo, se cambia el objeto y se guarda la lista completa.
+**Cuándo:** cambiar un dato. Se carga todo, se cambia el objeto en memoria y se guarda la lista completa.
+Las funciones modifican solo en memoria; `Main` decide cuándo guardar.
 
 ```java
-List<Producto> productos = cargar(archivo);
-Producto encontrado = null;
-for (Producto producto : productos) {
-    if (producto.getId() == id) {
-        encontrado = producto;
+public static Producto buscar(List<Producto> lista, int id) {
+    for (Producto producto : lista) {
+        if (producto.getId() == id) {
+            return producto;
+        }
     }
+    return null;
 }
-if (encontrado == null) {
-    System.out.println("ID no encontrado. El fichero no se modifica.");
-    return;
+
+// false si el ID no existe o el stock es negativo
+public static boolean cambiarStock(List<Producto> lista, int id, int stock) {
+    Producto producto = buscar(lista, id);
+    if (producto == null || stock < 0) {
+        return false;
+    }
+    producto.setStock(stock);
+    return true;
 }
-encontrado.setStock(stock);
-try (ObjectOutputStream salida = new ObjectOutputStream(Files.newOutputStream(archivo))) {
-    salida.writeObject(productos);
+```
+
+**En `Main`:**
+
+```java
+boolean cambiado = cambiarStock(productos, id, stock);
+if (cambiado) {
+    guardar(archivo, productos);
+    System.out.println("Stock actualizado.");
+} else {
+    System.out.println("ID no encontrado o stock negativo. El fichero no se modifica.");
 }
 ```
 
 ### Capturar los errores de una operación binaria
-**Cuándo:** envolver la carga y el guardado.
+**Cuándo:** en `Main`, envolver la carga y el guardado.
 
 ```java
 try {
-    // cargar, modificar y guardar
+    List<Producto> productos = cargar(archivo);
+    // pedir datos, cambiarStock y guardar
 } catch (NumberFormatException e) {
     System.out.println("Introduce números enteros válidos. No se guardan cambios.");
-} catch (IOException | ClassNotFoundException e) {
+} catch (IOException e) {
     System.out.println("No se pudo leer o guardar el fichero: " + e.getMessage());
 }
 ```
@@ -594,42 +728,51 @@ try {
 
 ### Exportar una lista a XML
 **Cuándo:** generar un XML. Se usa la API, nunca concatenar etiquetas.
+Los errores de XML se convierten en `IOException` para simplificar `Main`.
 
 ```java
-Document documento = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-Element raiz = documento.createElement("productos");
-documento.appendChild(raiz);
+public static void exportarXml(Path archivo, List<Producto> productos) throws IOException {
+    try {
+        Document documento = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Element raiz = documento.createElement("productos");
+        documento.appendChild(raiz);
 
-for (Producto p : productos) {
-    Element producto = documento.createElement("producto");
-    producto.setAttribute("id", String.valueOf(p.getId()));
+        for (Producto p : productos) {
+            Element producto = documento.createElement("producto");
+            producto.setAttribute("id", String.valueOf(p.getId()));
 
-    Element nombre = documento.createElement("nombre");
-    nombre.setTextContent(p.getNombre());
-    Element precio = documento.createElement("precio");
-    precio.setTextContent(String.valueOf(p.getPrecio()));
-    Element stock = documento.createElement("stock");
-    stock.setTextContent(String.valueOf(p.getStock()));
+            Element nombre = documento.createElement("nombre");
+            nombre.setTextContent(p.getNombre());
+            Element precio = documento.createElement("precio");
+            precio.setTextContent(String.valueOf(p.getPrecio()));
+            Element stock = documento.createElement("stock");
+            stock.setTextContent(String.valueOf(p.getStock()));
 
-    producto.appendChild(nombre);
-    producto.appendChild(precio);
-    producto.appendChild(stock);
-    raiz.appendChild(producto);
+            producto.appendChild(nombre);
+            producto.appendChild(precio);
+            producto.appendChild(stock);
+            raiz.appendChild(producto);
+        }
+
+        Files.createDirectories(archivo.getParent());
+        Transformer transformador = TransformerFactory.newInstance().newTransformer();
+        transformador.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformador.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformador.transform(new DOMSource(documento), new StreamResult(archivo.toFile()));
+    } catch (ParserConfigurationException | TransformerException e) {
+        throw new IOException("No se pudo exportar el XML: " + e.getMessage(), e);
+    }
 }
-
-Files.createDirectories(ruta.getParent());
-Transformer transformador = TransformerFactory.newInstance().newTransformer();
-transformador.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-transformador.setOutputProperty(OutputKeys.INDENT, "yes");
-transformador.transform(new DOMSource(documento), new StreamResult(ruta.toFile()));
 ```
 
 Imports extra:
 
 ```java
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -692,6 +835,7 @@ private static String texto(Element padre, String etiqueta) {
 ```
 
 ### Uso: la lista actual solo cambia si la importación termina bien
+**En `Main`:**
 
 ```java
 try {
@@ -718,11 +862,14 @@ try {
 ```
 
 ### Exportar una lista
+**Cuándo:** generar un JSON con la lista actual.
 
 ```java
-ObjectMapper mapper = new ObjectMapper();
-Files.createDirectories(ruta.getParent());
-mapper.writerWithDefaultPrettyPrinter().writeValue(ruta.toFile(), productos);
+public static void exportarJson(Path ruta, List<Producto> productos) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    Files.createDirectories(ruta.getParent());
+    mapper.writerWithDefaultPrettyPrinter().writeValue(ruta.toFile(), productos);
+}
 ```
 
 ### Importar con validación
@@ -730,10 +877,16 @@ mapper.writerWithDefaultPrettyPrinter().writeValue(ruta.toFile(), productos);
 Para `readValue`, la clase necesita constructor vacío y setters (o ser un `record`).
 
 ```java
-List<Producto> temporales = mapper.readValue(
-        ruta.toFile(), new TypeReference<List<Producto>>() {});
-validar(temporales);
-productosActuales = temporales;
+public static List<Producto> importarJson(Path ruta) throws IOException {
+    if (Files.notExists(ruta)) {
+        throw new IOException("No existe el archivo");
+    }
+    ObjectMapper mapper = new ObjectMapper();
+    List<Producto> temporales = mapper.readValue(
+            ruta.toFile(), new TypeReference<List<Producto>>() {});
+    validar(temporales);
+    return temporales;
+}
 ```
 
 ### Validar la lista importada
@@ -755,13 +908,12 @@ private static void validar(List<Producto> productos) {
 ```
 
 ### Capturar los errores
+**En `Main`:** `productosActuales` solo cambia si `importarJson` termina sin excepción.
 
 ```java
 try {
-    if (!Files.exists(archivo)) {
-        throw new IOException("No existe el archivo");
-    }
-    // importar y validar
+    productosActuales = importarJson(archivo);
+    System.out.println("Importación correcta.");
 } catch (IOException | IllegalArgumentException e) {
     System.out.println("Importación rechazada: " + e.getMessage());
 }
@@ -817,7 +969,7 @@ public class RepositorioTexto implements RepositorioProductos {
                     productos.add(new Producto(Integer.parseInt(campos[0]), campos[1],
                             Double.parseDouble(campos[2]), Integer.parseInt(campos[3])));
                 } catch (NumberFormatException e) {
-                    System.out.println("Línea ignorada: " + linea);
+                    // Se ignora la línea con datos no numéricos
                 }
             }
         }
@@ -853,12 +1005,14 @@ public class RepositorioTexto implements RepositorioProductos {
 
 ## 13. Recordatorios
 
+- Las funciones de datos no usan `System.out` ni `Scanner`: devuelven `boolean`, `null`, una lista o lanzan `IOException`. `Main` muestra los mensajes y pide los datos.
+- Convención de retorno: `boolean` si la operación se hizo o no, `null` si no se encuentra, lista vacía si el archivo no existe.
 - `newBufferedWriter` sin opciones **sustituye** el contenido. Para añadir hace falta `CREATE` + `APPEND`.
 - `Files.write` con una lista **sustituye** el contenido: la lista debe llevar todas las líneas que se conservan.
 - Solo se reescribe el fichero si el registro existe y los datos nuevos son válidos.
-- Antes de reescribir: copia de seguridad. Antes de restaurar: confirmación.
+- Antes de reescribir: copia de seguridad. Antes de restaurar: confirmación (en `Main`).
 - En una importación: leer y validar todo en una lista temporal, y solo después sustituir los datos.
-- `Integer.parseInt` siempre dentro de `try/catch (NumberFormatException)`.
+- `Integer.parseInt` siempre dentro de `try/catch (NumberFormatException)`, o en `Main` con el `catch` exterior del menú.
 - En binario se guarda la **lista completa**, no objeto a objeto.
 - En `RandomAccessFile`: posición = `numeroRegistro * TAM_REGISTRO`; el ID es un dato dentro del registro.
 - Tamaños: `int` 4, `boolean` 1, `char` 2 bytes. Registro de ejemplo: 53 bytes.
