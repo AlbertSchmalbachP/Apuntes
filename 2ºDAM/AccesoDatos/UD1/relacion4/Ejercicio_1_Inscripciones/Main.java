@@ -67,7 +67,14 @@ public class Main {
                         case 6 -> {
                             // TODO 1.6-C - Pedir confirmación S/N antes de restaurar.
                             // Pide confirmación antes de llamar a restaurar.
-                            System.out.println("TODO 1.6-C pendiente.");
+                            System.out.print("¿Restaurar la última copia? (S/N): ");
+                            String respuesta = teclado.nextLine().trim();
+                            if (respuesta.equalsIgnoreCase("S")) {
+                                boolean restaurada = GestorInscripciones.restaurar(archivo);
+                                System.out.println(restaurada ? "Copia restaurada." : "No existe ninguna copia.");
+                            } else {
+                                System.out.println("Restauración cancelada.");
+                            }
                         }
                         case 0 -> System.out.println("Hasta luego.");
                         default -> System.out.println("Opción desconocida.");

@@ -80,14 +80,35 @@ public class GestorInscripciones {
     // Si no existe, NO reescribir el archivo ni su copia.
     public static boolean eliminar(Path archivo, int id) throws IOException {
         // PASO 4: reconstruye la lista omitiendo el ID solicitado.
-        return false;
+        List<String> originales = Files.readAllLines(archivo, StandardCharsets.UTF_8);
+        List<String> nuevas = new ArrayList<>();
+        boolean encontrado = false;
+        for (String linea : originales) {
+            String[] campos = linea.split(";", -1);
+            if (campos.length == 3 && campos[0].trim().equals(String.valueOf(id))) {
+                encontrado = true;
+            } else {
+                nuevas.add(linea);
+            }
+        }
+        if (encontrado) {
+            Files.write(archivo, nuevas, StandardCharsets.UTF_8);
+            System.out.println("Registro eliminado.");
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // TODO 1.5 - Restaurar archivo.csv.bak sobre archivo.csv.
     // La confirmación se pide en Main, NO aquí.
     public static boolean restaurar(Path archivo) throws IOException {
-        // PASO 5: localiza .bak y cópialo sobre el CSV
-        return false;
+        Path copia = Path.of(archivo.toString() + ".bak");
+        if (Files.notExists(copia)) {
+            return false;
+        }
+        Files.copy(copia, archivo, StandardCopyOption.REPLACE_EXISTING);
+        return true;
     }
 
     // MÉTODOS PROPORCIONADOS. No se deben completar.
