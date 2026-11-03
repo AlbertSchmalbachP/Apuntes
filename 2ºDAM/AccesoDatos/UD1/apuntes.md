@@ -8,6 +8,51 @@ Formato de registro en TXT/CSV: `id;campo2;campo3`, un registro por línea.
 ## 0. Plantilla inicial menú
 
 ```java
+// CON SWITCH
+Path archivo = Path.of("datos", "archivo.csv");
+try (Scanner teclado = new Scanner(System.in)) {
+    int opcion = -1;
+    while (opcion != 0) {
+        System.out.println("\nMENÚ");
+        System.out.println("1. Listar | 2. Buscar | 3. Alta | 4. Modificar");
+        System.out.println("5. Eliminar | 6. Crear copia | 7. Restaurar copia | 0. Salir");
+        System.out.print("Opción: ");
+        try {
+            opcion = Integer.parseInt(teclado.nextLine().trim());
+            switch (opcion) {
+                case 1 -> {
+                    // Listar
+                }
+                case 2 -> {
+                    // Buscar
+                }
+                case 3 -> {
+                    // Alta
+                }
+                case 4 -> {
+                    // Modificar
+                }
+                case 5 -> {
+                    // Eliminar
+                }
+                case 6 -> {
+                    // Crear copia
+                }
+                case 7 -> {
+                    // Restaurar copia
+                }
+                case 0 -> System.out.println("Hasta luego.");
+                default -> System.out.println("Opción desconocida.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Introduce un número entero válido.");
+        } catch (IOException e) {
+            System.out.println("Error de archivo: " + e.getMessage());
+        }
+    }
+}
+
+// CON IF/ELSE
 Path archivo = Path.of("datos", "archivo.csv");
 try (Scanner escaner = new Scanner(System.in)) {
     String opcion = "-1";
