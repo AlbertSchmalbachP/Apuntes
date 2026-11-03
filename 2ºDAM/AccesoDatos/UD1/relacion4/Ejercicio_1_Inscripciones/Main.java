@@ -49,7 +49,7 @@ public class Main {
                             System.out.println(alta ? "Inscripción añadida." : "Datos incorrectos o ID repetido.");
                         }
                         case 4 -> {
-                            // TODO 1.6-A - Pedir ID y nuevas plazas, llamar a actualizarPlazas
+                            // 1.6-A - Pedir ID y nuevas plazas, llamar a actualizarPlazas
                             // y mostrar un mensaje distinto según el boolean recibido.
                             // Solicita ID, plazas y muestra el resultado.
                             System.out.println("Introduce un ID: ");
@@ -65,7 +65,7 @@ public class Main {
                             System.out.println("TODO 1.6-B pendiente.");
                         }
                         case 6 -> {
-                            // TODO 1.6-C - Pedir confirmación S/N antes de restaurar.
+                            // 1.6-C - Pedir confirmación S/N antes de restaurar.
                             // Pide confirmación antes de llamar a restaurar.
                             System.out.print("¿Restaurar la última copia? (S/N): ");
                             String respuesta = teclado.nextLine().trim();

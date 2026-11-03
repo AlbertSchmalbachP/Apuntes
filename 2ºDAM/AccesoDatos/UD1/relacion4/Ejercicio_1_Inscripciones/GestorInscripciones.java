@@ -9,7 +9,7 @@ import java.util.List;
 public class GestorInscripciones {
     private static final String CABECERA = "id;persona;taller;plazas";
 
-    // TODO 1.1 - Leer el CSV en UTF-8, ignorar cabecera y validar TODAS las filas.
+    // 1.1 - Leer el CSV en UTF-8, ignorar cabecera y validar TODAS las filas.
     // Si el archivo no existe, devolver una lista vacía.
     // Si una fila es incorrecta o hay IDs duplicados, lanzar IOException.
     public static List<Inscripcion> cargar(Path archivo) throws IOException {
@@ -36,7 +36,7 @@ public class GestorInscripciones {
         return inscripciones;
     }
 
-    // TODO 1.2 - Buscar por ID. Devolver la inscripción o null.
+    // 1.2 - Buscar por ID. Devolver la inscripción o null.
     public static Inscripcion buscar(List<Inscripcion> lista, int id) {
         // PASO 2: recorre la lista y compara los ID.
         Inscripcion inscripcionEncontrada = null;
@@ -60,7 +60,7 @@ public class GestorInscripciones {
         return true;
     }
 
-    // TODO 1.3 - Si el ID existe y plazas >= 0, cambiar SOLO ese registro.
+    // 1.3 - Si el ID existe y plazas >= 0, cambiar SOLO ese registro.
     // Crear copia antes de reescribir. Si no existe o plazas < 0, devolver false.
     public static boolean actualizarPlazas(Path archivo, int id, int plazas) throws IOException {
         // PASO 3: carga, busca, valida, crea copia y guarda.
@@ -76,7 +76,7 @@ public class GestorInscripciones {
         return true;
     }
 
-    // TODO 1.4 - Eliminar el ID solicitado y conservar todos los demás.
+    // 1.4 - Eliminar el ID solicitado y conservar todos los demás.
     // Si no existe, NO reescribir el archivo ni su copia.
     public static boolean eliminar(Path archivo, int id) throws IOException {
         // PASO 4: reconstruye la lista omitiendo el ID solicitado.
@@ -100,7 +100,7 @@ public class GestorInscripciones {
         }
     }
 
-    // TODO 1.5 - Restaurar archivo.csv.bak sobre archivo.csv.
+    // 1.5 - Restaurar archivo.csv.bak sobre archivo.csv.
     // La confirmación se pide en Main, NO aquí.
     public static boolean restaurar(Path archivo) throws IOException {
         Path copia = Path.of(archivo.toString() + ".bak");
