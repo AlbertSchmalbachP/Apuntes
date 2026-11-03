@@ -14,9 +14,15 @@ try (Scanner teclado = new Scanner(System.in)) {
     int opcion = -1;
     while (opcion != 0) {
         System.out.println("\nMENÚ");
-        System.out.println("1. Listar | 2. Buscar | 3. Alta | 4. Modificar");
-        System.out.println("5. Eliminar | 6. Crear copia | 7. Restaurar copia | 0. Salir");
-        System.out.print("Opción: ");
+        System.out.println("1. Listar");
+        System.out.println("2. Buscar");
+        System.out.println("3. Alta");
+        System.out.println("4. Modificar");
+        System.out.println("5. Eliminar");
+        System.out.println("6. Crear copia");
+        System.out.println("7. Restaurar copia");
+        System.out.println("\n0. Salir");
+        System.out.print("\nIntroduce una opción: ");
         try {
             opcion = Integer.parseInt(teclado.nextLine().trim());
             switch (opcion) {
@@ -41,8 +47,8 @@ try (Scanner teclado = new Scanner(System.in)) {
                 case 7 -> {
                     // Restaurar copia
                 }
-                case 0 -> System.out.println("Hasta luego.");
-                default -> System.out.println("Opción desconocida.");
+                case 0 -> System.out.println("Programa finalizado.");
+                default -> System.out.println("Opción no válida.");
             }
         } catch (NumberFormatException e) {
             System.out.println("Introduce un número entero válido.");
@@ -89,7 +95,7 @@ try (Scanner escaner = new Scanner(System.in)) {
         }
     }
 } catch (Exception e) {
-    System.out.println("Error inesperado: " + e.getMessage());
+    System.out.println("Error: " + e.getMessage());
 }
 ```
 
