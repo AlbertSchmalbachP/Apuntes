@@ -708,6 +708,63 @@ if (cambiado) {
 }
 ```
 
+### Alta y baja en la lista
+**Cuándo:** añadir o quitar un objeto. Solo se modifica la lista en memoria; `Main` decide cuándo guardar. Devuelve `false` si los datos son inválidos o el ID ya existe (alta), o si el ID no existe (baja).
+
+```java
+public static boolean anadir(List<Producto> lista, Producto nuevo) {
+    if (nuevo.getId() <= 0 || nuevo.getNombre().isBlank()
+            || nuevo.getPrecio() < 0 || nuevo.getStock() < 0
+            || buscar(lista, nuevo.getId()) != null) {
+        return false;
+    }
+    lista.add(nuevo);
+    return true;
+}
+
+public static boolean eliminar(List<Producto> lista, int id) {
+    Producto producto = buscar(lista, id);
+    if (producto == null) {
+        return false;
+    }
+    lista.remove(producto);
+    return true;
+}
+```
+
+**En `Main`:**
+
+```java
+boolean eliminado = eliminar(productos, id);
+if (eliminado) {
+    guardar(archivo, productos);
+    System.out.println("Producto eliminado.");
+} else {
+    System.out.println("ID no encontrado. El fichero no se modifica.");
+}
+```
+
+### Ordenar y filtrar una lista
+**Cuándo:** listados ordenados o búsquedas por nombre. Valen para cualquier lista (binario, XML o JSON). Devuelven una lista nueva y no tocan la original.
+
+```java
+public static List<Producto> ordenarPorNombre(List<Producto> lista) {
+    List<Producto> copia = new ArrayList<>(lista);
+    copia.sort(Comparator.comparing(p -> p.getNombre().toLowerCase()));
+    return copia;
+}
+
+public static List<Producto> filtrarPorNombre(List<Producto> lista, String texto) {
+    List<Producto> resultado = new ArrayList<>();
+    for (Producto p : lista) {
+        if (p.getNombre().toLowerCase().contains(texto.trim().toLowerCase())) {
+            resultado.add(p);
+        }
+    }
+    return resultado;
+}
+```
+
 ### Capturar los errores de una operación binaria
 **Cuándo:** en `Main`, envolver la carga y el guardado.
 
