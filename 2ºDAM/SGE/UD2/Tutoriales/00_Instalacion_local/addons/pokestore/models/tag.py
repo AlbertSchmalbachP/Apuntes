@@ -6,3 +6,8 @@ class PokestoreTag(models.Model):
     
     name = fields.Char(string="Nombre", required=True)
     
+    figure_ids = fields.Many2Many(
+        "pokestore.figure",
+        "collection_id",
+        string="Figuras",
+    )
