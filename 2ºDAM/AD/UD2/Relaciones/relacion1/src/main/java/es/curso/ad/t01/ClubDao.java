@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class ClubDao {
+
     public int insertar(String nombre, String ciudad,
-                        BigDecimal presupuesto) throws SQLException {
+            BigDecimal presupuesto) throws SQLException {
         String sql = "INSERT INTO club(nombre, ciudad, presupuesto) VALUES (?, ?, ?)";
-        try (Connection conexion = Conexion.abrir();
-             PreparedStatement sentencia = conexion.prepareStatement(
-                     sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conexion = Conexion.abrir(); PreparedStatement sentencia = conexion.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS)) {
             sentencia.setString(1, nombre);
             sentencia.setString(2, ciudad);
             sentencia.setBigDecimal(3, presupuesto);
@@ -33,9 +33,7 @@ public class ClubDao {
     public List<Club> listar() throws SQLException {
         String sql = "SELECT id, nombre, ciudad, presupuesto FROM club ORDER BY id";
         List<Club> clubes = new ArrayList<>();
-        try (Connection conexion = Conexion.abrir();
-             PreparedStatement sentencia = conexion.prepareStatement(sql);
-             ResultSet filas = sentencia.executeQuery()) {
+        try (Connection conexion = Conexion.abrir(); PreparedStatement sentencia = conexion.prepareStatement(sql); ResultSet filas = sentencia.executeQuery()) {
             while (filas.next()) {
                 clubes.add(leerClub(filas));
             }
@@ -45,8 +43,7 @@ public class ClubDao {
 
     public Optional<Club> buscar(int id) throws SQLException {
         String sql = "SELECT id, nombre, ciudad, presupuesto FROM club WHERE id = ?";
-        try (Connection conexion = Conexion.abrir();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = Conexion.abrir(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             sentencia.setInt(1, id);
             try (ResultSet filas = sentencia.executeQuery()) {
                 if (filas.next()) {
@@ -59,18 +56,30 @@ public class ClubDao {
 
     public boolean cambiarCiudad(int id, String ciudad) throws SQLException {
         String sql = "UPDATE club SET ciudad = ? WHERE id = ?";
-        try (Connection conexion = Conexion.abrir();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = Conexion.abrir(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             sentencia.setString(1, ciudad);
             sentencia.setInt(2, id);
             return sentencia.executeUpdate() == 1;
         }
     }
 
+    public List<Club> listarPorCiudad(String ciudad) throws SQLException {
+        String sql = "SELECT id, nombre, ciudad, presupuesto FROM club WHERE ciudad = ? ORDER BY id";
+        List<Club> clubes = new ArrayList<>();
+        try (Connection conexion = Conexion.abrir(); 
+        PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+            sentencia.setString(1, ciudad);
+            ResultSet filas = sentencia.executeQuery();
+            while (filas.next()) {
+                clubes.add(leerClub(filas));
+            }
+        }
+        return clubes;
+    }
+
     public boolean borrar(int id) throws SQLException {
         String sql = "DELETE FROM club WHERE id = ?";
-        try (Connection conexion = Conexion.abrir();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = Conexion.abrir(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             sentencia.setInt(1, id);
             return sentencia.executeUpdate() == 1;
         }
