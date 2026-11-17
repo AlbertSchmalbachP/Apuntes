@@ -1,7 +1,7 @@
 from odoo import fields, models  # pyright: ignore[reportMissingImports]
 
 class PokestoreColeccion(models.Model):
-    _name = "pokestore.coleccion"
+    _name = "pokestore.collection"
     _description = "Colección de figuras"
     
     name = fields.Char(string="Nombre", required=True)
