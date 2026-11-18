@@ -20,6 +20,9 @@ public class Main {
             System.out.println("Tras cambiar: " + dao.buscar(id).orElseThrow());
             System.out.println("Borrado: " + dao.borrar(id));
             System.out.println("¿Sigue existiendo? " + dao.buscar(id).isPresent());
+            System.out.println("EJERCICIOS RELACION 1");
+            System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Málaga"));
+            System.out.println("Clubes de Mérida: " + dao.listarPorCiudad("Mérida"));
         } catch (SQLException e) {
             System.err.println("Error de base de datos: " + e.getMessage());
         }

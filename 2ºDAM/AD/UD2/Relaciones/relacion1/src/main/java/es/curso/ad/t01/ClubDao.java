@@ -64,7 +64,7 @@ public class ClubDao {
     }
 
     public List<Club> listarPorCiudad(String ciudad) throws SQLException {
-        String sql = "SELECT id, nombre, ciudad, presupuesto FROM club WHERE ciudad = ? ORDER BY id";
+        String sql = "SELECT id, nombre, ciudad, presupuesto FROM club WHERE ciudad = ? ORDER BY nombre";
         List<Club> clubes = new ArrayList<>();
         try (Connection conexion = Conexion.abrir(); 
         PreparedStatement sentencia = conexion.prepareStatement(sql)) {
