@@ -90,7 +90,7 @@ public class ClubDao {
                 sentencia.setInt(1, clubId);
                 try (ResultSet filas = sentencia.executeQuery()) {
                     if (!filas.next()) {
-                        throw new SQLException("El club " + clubId + " no existe");
+                        throw new SQLException("El club no existe.");
                     }
                 }
             }
@@ -100,7 +100,7 @@ public class ClubDao {
                 sentencia.setInt(2, dorsal);
                 try (ResultSet filas = sentencia.executeQuery()) {
                     if (filas.next()) {
-                        throw new SQLException("El dorsal " + dorsal + " ya existe en el club " + clubId);
+                        throw new SQLException("El dorsal " + dorsal + " ya existe en el club.");
                     }
                 }
             }
