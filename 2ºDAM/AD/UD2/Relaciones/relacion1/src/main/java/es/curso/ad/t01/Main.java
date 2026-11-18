@@ -21,11 +21,29 @@ public class Main {
             System.out.println("Borrado: " + dao.borrar(id));
             System.out.println("¿Sigue existiendo? " + dao.buscar(id).isPresent());
             System.out.println("EJERCICIOS RELACION 1");
+            // ej1
             System.out.println("Clubes de Granada: " + dao.listarPorCiudad("Granada"));
-            System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Málaga")); //! No funciona como se esperaba. Resultado real: []
+            System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Malaga")); //! No funciona como se esperaba. Resultado real: []
             System.out.println("Clubes de Barcelona: " + dao.listarPorCiudad("Barcelona"));
-
-            // TODO: Agregar comporbaciones del ejercicio 2
+            // ej2
+            try {
+                System.out.println("Jugador válido: " +
+                    dao.insertarJugador("Leo Pessi", 10, 2));
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+            try {
+                System.out.println("Jugador en club no existente: " + dao.insertarJugador("Cristiano Penaldo", 15, 8));
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+            try {
+                System.out.println("Jugador con dorsal repetido: " + dao.insertarJugador("Sofía Bergona", 10, 2));
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+            // ej3
+            
         } catch (SQLException e) {
             System.err.println("Error de base de datos: " + e.getMessage());
         }

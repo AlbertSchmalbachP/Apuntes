@@ -120,6 +120,15 @@ public class ClubDao {
         throw new SQLException("No se pudo obtener el ID generado");
     }
 
+    //* EJERCICIO 3
+
+
+    //* EJERCICIO 4
+
+
+    //* EJERCICIO 5
+
+
     public boolean borrar(int id) throws SQLException {
         String sql = "DELETE FROM club WHERE id = ?";
         try (Connection conexion = Conexion.abrir(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
