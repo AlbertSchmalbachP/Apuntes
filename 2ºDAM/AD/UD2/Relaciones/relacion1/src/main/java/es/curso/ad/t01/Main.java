@@ -24,6 +24,8 @@ public class Main {
             System.out.println("Clubes de Granada: " + dao.listarPorCiudad("Granada"));
             System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Málaga")); //! No funciona como se esperaba. Resultado real: []
             System.out.println("Clubes de Barcelona: " + dao.listarPorCiudad("Barcelona"));
+
+            // TODO: Agregar comporbaciones del ejercicio 2
         } catch (SQLException e) {
             System.err.println("Error de base de datos: " + e.getMessage());
         }
