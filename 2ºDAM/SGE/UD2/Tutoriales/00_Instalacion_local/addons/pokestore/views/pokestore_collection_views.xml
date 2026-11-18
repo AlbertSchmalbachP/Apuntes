@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pokestore_collection_view_list" model="ir.ui.view">
+        <field name="name">pokestore.collection.list</field>
+        <field name="model">pokestore.collection</field>
+        <field name="arch" type="xml">
+            <list string="Colecciones">
+                <field name="name"/>
+                <field name="generation"/>
+                <field name="release_date"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="pokestore_collection_view_form" model="ir.ui.view">
+        <field name="name">pokestore.collection.form</field>
+        <field name="model">pokestore.collection</field>
+        <field name="arch" type="xml">
+            <form string="Colección">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="generation"/>
+                        </group>
+                        <group>
+                            <field name="release_date"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Figuras" name="figures">
+                            <field name="figure_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="pokemon"/>
+                                    <field name="rarity"/>
+                                    <field name="price"/>
+                                    <field name="stock"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="pokestore_collection_action" model="ir.actions.act_window">
+        <field name="name">Colecciones</field>
+        <field name="res_model">pokestore.collection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

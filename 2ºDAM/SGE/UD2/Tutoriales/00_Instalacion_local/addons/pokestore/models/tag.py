@@ -1,13 +1,9 @@
 from odoo import fields, models
 
-class PokestoreTag(models.Model):
-    _name = "Tag"
-    _description = "Etiquetas para cada figura."
-    
+
+class PokeStoreTag(models.Model):
+    _name = "pokestore.tag"
+    _description = "Etiqueta PokeStore"
+    _order = "name"
+
     name = fields.Char(string="Nombre", required=True)
-    
-    figure_ids = fields.Many2Many(
-        "pokestore.figure",
-        "collection_id",
-        string="Figuras",
-    )

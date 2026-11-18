@@ -11,35 +11,89 @@
                 <field name="rarity" />
                 <field name="price" />
                 <field name="stock" />
+                <field name="stock_value" />
             </list>
         </field>
     </record>
+
     <record id="pokestore_figure_view_form" model="ir.ui.view">
         <field name="name">pokestore.figure.form</field>
         <field name="model">pokestore.figure</field>
         <field name="arch" type="xml">
             <form string="Figura">
+                <header>
+                    <button
+                        name="action_deplete_stock"
+                        type="object"
+                        string="Agotar stock"
+                        class="btn-primary"
+                    />
+                </header>
                 <sheet>
                     <group>
                         <group>
                             <field name="name" />
                             <field name="pokemon" />
                             <field name="collection_id" />
+                            <field name="tag_ids" widget="many2many_tags" />
                         </group>
                         <group>
                             <field name="rarity" />
                             <field name="price" />
                             <field name="stock" />
+                            <field name="stock_value" readonly="1" />
                             <field name="active" />
                         </group>
+                    </group>
+                    <group string="Información interna">
+                        <field name="internal_notes" placeholder="Notas internas..." />
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
+
+    <record id="pokestore_figure_view_search" model="ir.ui.view">
+        <field name="name">pokestore.figure.search</field>
+        <field name="model">pokestore.figure</field>
+        <field name="arch" type="xml">
+            <search string="Buscar figuras">
+                <field name="name" />
+                <field name="pokemon" />
+                <field name="collection_id" />
+                <field name="tag_ids" />
+                <filter
+                    name="exclusive"
+                    string="Exclusivas"
+                    domain="[('rarity', '=', 'exclusive')]"
+                />
+                <group expand="0" string="Agrupar por">
+                    <filter
+                        name="group_collection"
+                        string="Colección"
+                        context="{'group_by': 'collection_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="pokestore_action_delete_stocl" model="ir.actions.server">
+        <field name="name">🗑️ Agotar stock</field>
+        <field name="model_id" ref="model_pokestore_figure"/>
+        <field name="binding_model_id" ref="model_pokestore_figure"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            records.action_deplete_stock()
+        </field>
+
+    </record>
+
     <record id="pokestore_figure_action" model="ir.actions.act_window">
         <field name="name">Figuras</field>
         <field name="res_model">pokestore.figure</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="pokestore_figure_view_search" />
     </record>
 </odoo>
