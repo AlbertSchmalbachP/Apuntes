@@ -6,6 +6,7 @@
     "license": "LGPL-3",
     "depends": ["base"],
     "data": [
+        "security/pokestore_security.xml",
         "security/ir.model.access.csv",
         "views/pokestore_collection_views.xml",
         "views/pokestore_tag_views.xml",
