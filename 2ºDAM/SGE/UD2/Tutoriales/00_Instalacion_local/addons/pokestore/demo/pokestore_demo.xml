@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="figure_demo_archaludon" model="pokestore.figure">
+        <field name="name">Archaludon Ultimate</field>
+        <field name="pokemon">Archaludon</field>
+        <field name="collection_id" ref="pokestore.collection_jazwares_classics"/>
+        <field name="rarity">legendary</field>
+        <field name="price">999.99</field>
+        <field name="stock">8</field>
+    </record>
+
+    <record id="figure_demo_pikachu" model="pokestore.figure">
+        <field name="name">Pikachu Plateado</field>
+        <field name="pokemon">Pikachu</field>
+        <field name="collection_id" ref="pokestore.collection_pikachu_and_evee"/>
+        <field name="rarity">very rare</field>
+        <field name="price">74.95</field>
+        <field name="stock">3</field>
+    </record>
+
+    <record id="figure_demo_treecko" model="pokestore.figure">
+        <field name="name">Quilava Evolved</field>
+        <field name="pokemon">Quilava</field>
+        <field name="collection_id" ref="pokestore.collection_pokemon_30aniversary"/>
+        <field name="rarity">rare</field>
+        <field name="price">18.00</field>
+        <field name="stock">12</field>
+    </record>
+</odoo>

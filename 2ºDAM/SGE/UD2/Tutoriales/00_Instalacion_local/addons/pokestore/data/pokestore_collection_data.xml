@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="collection_jazwares_classics" model="pokestore.collection">
+        <field name="name">Jazwares Classics</field>
+        <field name="generation">4</field>
+        <field name="release_date">2026-02-15</field>
+    </record>
+
+    <record id="collection_pikachu_and_evee" model="pokestore.collection">
+        <field name="name">Pikachu and Evee</field>
+        <field name="generation">3</field>
+        <field name="release_date">2026-04-24</field>
+    </record>
+
+    <record id="collection_pokemon_30aniversary" model="pokestore.collection">
+        <field name="name">Pokemón 30th Anniversary</field>
+        <field name="generation">1</field>
+        <field name="release_date">2026-07-11</field>
+    </record>
+</odoo>
