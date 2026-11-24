@@ -23,7 +23,7 @@ public class Main {
             System.out.println("EJERCICIOS RELACION 1");
             // ej1
             System.out.println("Clubes de Granada: " + dao.listarPorCiudad("Granada"));
-            System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Malaga")); //! No funciona como se esperaba. Resultado real: []
+            System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Mlaga"));
             System.out.println("Clubes de Barcelona: " + dao.listarPorCiudad("Barcelona"));
             // ej2
             try {
