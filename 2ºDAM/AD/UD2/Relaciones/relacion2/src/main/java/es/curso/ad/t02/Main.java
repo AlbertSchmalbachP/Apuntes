@@ -25,7 +25,6 @@ public class Main {
             System.out.println("Movimiento deshecho: " +
                     operaciones.deshacerUltimoMovimiento(6));
             operaciones.transferir(2, 3, new BigDecimal("150"));
-     
         } catch (SQLException e) {
             System.err.println("Error SQL: " + e.getMessage());
         }

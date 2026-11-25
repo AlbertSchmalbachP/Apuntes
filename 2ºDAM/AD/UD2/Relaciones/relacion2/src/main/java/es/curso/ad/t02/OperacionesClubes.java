@@ -140,4 +140,7 @@ public class OperacionesClubes {
         }
     }
 
+    public void ficharJugador() {
+        // TODO
+    }
 }
