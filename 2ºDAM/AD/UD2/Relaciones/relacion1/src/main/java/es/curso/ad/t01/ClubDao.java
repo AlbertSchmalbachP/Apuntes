@@ -78,56 +78,56 @@ public class ClubDao {
         return clubes;
     }
 
-    //* EJERCICIO 2
-    public int insertarJugador(String nombre, int dorsal, int clubId) throws SQLException {
-        String sqlClub = "SELECT id FROM club WHERE id = ?";
-        String sqlDorsal = "SELECT id FROM jugador WHERE club_id = ? AND dorsal = ?";
-        String sqlInsertar = "INSERT INTO jugador (nombre, dorsal, club_id) VALUES (?, ?, ?)";
-        try (Connection conexion = Conexion.abrir()) {
-            //* Comprobaciones */
-            // 1. Comprobar que el club existe
-            try (PreparedStatement sentencia = conexion.prepareStatement(sqlClub)) {
-                sentencia.setInt(1, clubId);
-                try (ResultSet filas = sentencia.executeQuery()) {
-                    if (!filas.next()) {
-                        throw new SQLException("El club no existe.");
-                    }
-                }
-            }
-            // 2. Comprobar que el dorsal no está usado repetido (en el club)
-            try (PreparedStatement sentencia = conexion.prepareStatement(sqlDorsal)) {
-                sentencia.setInt(1, clubId);
-                sentencia.setInt(2, dorsal);
-                try (ResultSet filas = sentencia.executeQuery()) {
-                    if (filas.next()) {
-                        throw new SQLException("El dorsal " + dorsal + " ya existe en el club.");
-                    }
-                }
-            }
-            // 3. Insertar y recuperar el ID generado
-            try (PreparedStatement sentencia = conexion.prepareStatement(sqlInsertar, Statement.RETURN_GENERATED_KEYS)) {
-                sentencia.setString(1, nombre);
-                sentencia.setInt(2, dorsal);
-                sentencia.setInt(3, clubId);
-                sentencia.executeUpdate();
-                try (ResultSet claves = sentencia.getGeneratedKeys()) {
-                    if (claves.next()) {
-                        return claves.getInt(1);
-                    }
-                }
+    //* EJERCICIO 3
+    // R01.3: LEFT JOIN incluye clubes que tienen cero jugadores.
+    public List<ResumenClub> resumenes() throws SQLException {
+        String sql = "SELECT c.id, c.nombre, COUNT(j.id) AS total " +
+                "FROM club c LEFT JOIN jugador j ON j.club_id = c.id " +
+                "GROUP BY c.id ORDER BY c.nombre";
+        List<ResumenClub> resultado = new ArrayList<>();
+        try (Connection con = Conexion.abrir();
+            PreparedStatement st = con.prepareStatement(sql);
+            ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                resultado.add(new ResumenClub(rs.getInt("id"),
+                        rs.getString("nombre"), rs.getLong("total")));
             }
         }
-        throw new SQLException("No se pudo obtener el ID generado");
+        return resultado;
     }
 
-    //* EJERCICIO 3
-
-
     //* EJERCICIO 4
-
+    // R01.4: la FK de MySQL sigue siendo la última garantía.
+    public boolean borrarControlado(int id) throws SQLException {
+        String sql = "DELETE FROM club WHERE id = ? " +
+                "AND NOT EXISTS (SELECT 1 FROM jugador WHERE club_id = ?) " +
+                "AND NOT EXISTS (SELECT 1 FROM movimiento " +
+                "WHERE club_origen_id = ? OR club_destino_id = ?)";
+        try (Connection con = Conexion.abrir();
+            PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, id);
+            st.setInt(2, id);
+            st.setInt(3, id);
+            st.setInt(4, id);
+            return st.executeUpdate() == 1;
+        }
+    }
 
     //* EJERCICIO 5
-
+    // R01.5: aritmética decimal en MySQL, no en una lista Java.
+    public boolean aumentarPresupuesto(int id, BigDecimal cantidad)
+            throws SQLException {
+        if (cantidad == null || cantidad.signum() <= 0) {
+            throw new IllegalArgumentException("Cantidad positiva, con máximo dos decimales");
+        }
+        String sql = "UPDATE club SET presupuesto = presupuesto + ? WHERE id = ?";
+        try (Connection con = Conexion.abrir();
+            PreparedStatement st = con.prepareStatement(sql)) {
+            st.setBigDecimal(1, cantidad);
+            st.setInt(2, id);
+            return st.executeUpdate() == 1;
+        }
+    }
 
     public boolean borrar(int id) throws SQLException {
         String sql = "DELETE FROM club WHERE id = ?";

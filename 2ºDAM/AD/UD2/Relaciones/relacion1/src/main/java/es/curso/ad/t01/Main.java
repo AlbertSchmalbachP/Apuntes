@@ -5,47 +5,62 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        ClubDao dao = new ClubDao();
+        ClubDao clubes = new ClubDao();
+        JugadorDao jugadores = new JugadorDao();
+        Integer clubTemporal = null;
+        Integer jugadorTemporal = null;
         try {
-            System.out.println("CLUBES INICIALES");
-            for (Club club : dao.listar()) {
-                System.out.println(club);
+            System.out.println("R01.1 | Clubes de Granada: " + clubes.listarPorCiudad("Granada"));
+            System.out.println("Ciudad inexistente: " + clubes.listarPorCiudad("Nyiregyhaza"));
+            System.out.println("Ciudad con comilla: " + clubes.listarPorCiudad("L'Hospitalet de Llobregat"));
+
+            System.out.println("R01.3 | Resumen por club:");
+            clubes.resumenes().forEach(System.out::println);
+
+            System.out.println("R01.4 | Borrar id inexistente: " +
+                    clubes.borrarControlado(99999));
+            System.out.println("Borrar club 1 (con jugadores): " +
+                    clubes.borrarControlado(1));
+            System.out.println("R01.5 | Aumentar id inexistente: " +
+                    clubes.aumentarPresupuesto(99999, new BigDecimal("0.10")));
+            try {
+                clubes.aumentarPresupuesto(1, BigDecimal.ZERO);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Cantidad inválida rechazada: " + e.getMessage());
             }
 
-            String nombreTemporal = "Club de prueba JDBC";
-            int id = dao.insertar(nombreTemporal, "Granada", new BigDecimal("120.50"));
-            System.out.println("Creado con ID " + id);
-            System.out.println("Buscado: " + dao.buscar(id).orElseThrow());
-            System.out.println("Actualizado: " + dao.cambiarCiudad(id, "Jaén"));
-            System.out.println("Tras cambiar: " + dao.buscar(id).orElseThrow());
-            System.out.println("Borrado: " + dao.borrar(id));
-            System.out.println("¿Sigue existiendo? " + dao.buscar(id).isPresent());
-            System.out.println("EJERCICIOS RELACION 1");
-            // ej1
-            System.out.println("Clubes de Granada: " + dao.listarPorCiudad("Granada"));
-            System.out.println("Clubes de Málaga: " + dao.listarPorCiudad("Mlaga"));
-            System.out.println("Clubes de Barcelona: " + dao.listarPorCiudad("Barcelona"));
-            // ej2
+            // Valores efímeros. El borrado final permite repetir el programa.
+            String nombre = "Prueba R01 " + System.nanoTime();
+            clubTemporal = clubes.insertar(nombre, "Granada", new BigDecimal("10.50"));
+            int idCreado = clubTemporal;
+            System.out.println("Club vacío, resumen: " + clubes.resumenes().stream()
+                    .filter(c -> c.id() == idCreado).findFirst().orElseThrow());
+            System.out.println("Presupuesto incrementado: " +
+                    clubes.aumentarPresupuesto(clubTemporal, new BigDecimal("0.25")));
+            jugadorTemporal = jugadores.insertarJugador("Prueba R01", 1, clubTemporal);
+            System.out.println("R01.2 | Jugador creado con ID: " + jugadorTemporal);
             try {
-                System.out.println("Jugador válido: " +
-                    dao.insertarJugador("Leo Pessi", 10, 2));
+                jugadores.insertarJugador("Duplicado", 1, clubTemporal);
             } catch (SQLException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println("Dorsal duplicado rechazado, SQLState=" + e.getSQLState());
             }
             try {
-                System.out.println("Jugador en club no existente: " + dao.insertarJugador("Cristiano Penaldo", 15, 8));
+                jugadores.insertarJugador("Sin club", 12, 99999);
             } catch (SQLException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println("Club inexistente rechazado, SQLState=" + e.getSQLState());
             }
-            try {
-                System.out.println("Jugador con dorsal repetido: " + dao.insertarJugador("Sofía Bergona", 10, 2));
-            } catch (SQLException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-            // ej3
-            
+            System.out.println("Club con jugador, no se borra: " +
+                    clubes.borrarControlado(clubTemporal));
         } catch (SQLException e) {
-            System.err.println("Error de base de datos: " + e.getMessage());
+            System.err.println("Error SQL [" + e.getSQLState() + "]: " + e.getMessage());
+        } finally {
+            try {
+                if (jugadorTemporal != null) jugadores.borrarJugador(jugadorTemporal);
+                if (clubTemporal != null)
+                    System.out.println("Limpieza del club: " + clubes.borrarControlado(clubTemporal));
+            } catch (SQLException e) {
+                System.err.println("Limpieza incompleta: " + e.getMessage());
+            }
         }
     }
 }
